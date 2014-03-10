@@ -73,37 +73,24 @@ public class LogFileParser<T> implements Runnable
 					//进入反序列化阶段
 					//通过JSON处理工厂对象创建JSON分析器
 					JsonParser jsonParser= jsonFactory.createParser(currentJsonStr);
-					//反序列化的关键
-					T object = jsonParser.readValueAs(className);
-					if (object != null){
-						list.add(object);
+					try {
+						//反序列化的关键
+						T object = jsonParser.readValueAs(className);
+						if (object != null){
+							list.add(object);
+						}
+						
+					} catch (Exception e) 
+					{
+						logger.error("json数据解析错误在第{}行，具体的内容为：{}",idx,currentJsonStr);
+						continue;
 					}
+					
 					idx++;
 				}
 			} catch (IOException e) {
 				
 				logger.error(e.getMessage());
-				logger.error("json数据解析错误在第{}行，具体的内容为：{}",idx,currentJsonStr);
-				//略过改行报错的内容，继续下一行
-				try {
-					while((currentJsonStr = br.readLine()) != null){
-						currentJsonStr = new String(currentJsonStr.getBytes(), "UTF-8");
-						if(currentJsonStr.trim().equals("")) continue;
-						//进入反序列化阶段
-						//通过JSON处理工厂对象创建JSON分析器
-						JsonParser jsonParser= jsonFactory.createParser(currentJsonStr);
-						//反序列化的关键
-						T object = jsonParser.readValueAs(className);
-						
-						if (object != null){
-							list.add(object);
-						}
-						idx++;
-					}
-				} catch (Exception es) {
-					logger.error("捕获异常继续出错");
-				}
-				
 			}
 			finally{
 				if (br != null) {
