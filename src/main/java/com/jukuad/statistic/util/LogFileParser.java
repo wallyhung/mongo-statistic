@@ -5,7 +5,6 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -49,7 +48,6 @@ public class LogFileParser<T> implements Runnable
 		this.count = count;
 	}
 	
-	@SuppressWarnings("resource")
 	public ArrayList<T> parse()
 	{
 		
@@ -77,16 +75,51 @@ public class LogFileParser<T> implements Runnable
 					JsonParser jsonParser= jsonFactory.createParser(currentJsonStr);
 					//反序列化的关键
 					T object = jsonParser.readValueAs(className);
-					
 					if (object != null){
 						list.add(object);
 					}
 					idx++;
 				}
-			} catch (UnsupportedEncodingException e) {
-				logger.error(e.getMessage());
 			} catch (IOException e) {
+				
 				logger.error(e.getMessage());
+				logger.error("json数据解析错误在第{}行，具体的内容为：{}",idx,currentJsonStr);
+				//略过改行报错的内容，继续下一行
+				try {
+					while((currentJsonStr = br.readLine()) != null){
+						currentJsonStr = new String(currentJsonStr.getBytes(), "UTF-8");
+						if(currentJsonStr.trim().equals("")) continue;
+						//进入反序列化阶段
+						//通过JSON处理工厂对象创建JSON分析器
+						JsonParser jsonParser= jsonFactory.createParser(currentJsonStr);
+						//反序列化的关键
+						T object = jsonParser.readValueAs(className);
+						
+						if (object != null){
+							list.add(object);
+						}
+						idx++;
+					}
+				} catch (Exception es) {
+					logger.error("捕获异常继续出错");
+				}
+				
+			}
+			finally{
+				if (br != null) {
+	                try {
+	                    br.close();
+	                } catch (IOException e1) {
+	                	logger.error("关闭读取文件的缓冲流出错：{}。",e1.getMessage());
+	                }
+	            }
+				if (fr != null) {
+	                try {
+	                    fr.close();
+	                } catch (IOException e2) {
+	                	logger.error("关闭读取文件的缓冲流出错：{}。",e2.getMessage());
+	                }
+	            }
 			}
 		} catch (FileNotFoundException e) {
 			logger.error(e.getMessage());
@@ -132,7 +165,6 @@ public class LogFileParser<T> implements Runnable
 			logger.info("已存入:"+ key.getId() + ",元素序列:");
 			}else
 			{
-				System.out.println("元素序列"+ "发生错误,JSON:");
 				logger.error("元素序列"+ "发生错误,JSON:");
 				break;
 			}
