@@ -10,6 +10,7 @@ import org.slf4j.LoggerFactory;
 
 import com.jukuad.statistic.service.LogAnalysisService;
 import com.jukuad.statistic.service.StatisticService;
+import com.jukuad.statistic.util.Constant;
 
 public class HourJob implements Job
 {
@@ -22,7 +23,8 @@ public class HourJob implements Job
 		logger.info("当前的时间为：{}",new Date().getTime());
 		logger.info("Generating report -{}; hour = {} ",context.getJobDetail().getFullName(), context.getJobDetail().getJobDataMap().get("hour"));
 		
-		if(LogAnalysisService.existNewLogs())
+		//检测是否有请求日志
+		if(LogAnalysisService.existNewLogs(Constant.PATH_REQUEST))
 		{
 			//统计任务
 			StatisticService.statistic();

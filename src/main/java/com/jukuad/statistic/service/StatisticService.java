@@ -22,6 +22,7 @@ import com.jukuad.statistic.pojo.Install;
 import com.jukuad.statistic.pojo.Push;
 import com.jukuad.statistic.pojo.Request;
 import com.jukuad.statistic.pojo.View;
+import com.jukuad.statistic.util.Constant;
 import com.jukuad.statistic.util.TimeUtil;
 
 public class StatisticService 
@@ -41,26 +42,44 @@ public class StatisticService
 			count.await();
 			logger.info("日志分析任务完成：{}。开始定时统计任务",new Date().getTime());
 			
-			MongoService<Request> se = new MongoServiceImpl<Request>();
-			se.executeRequestMapReduce(Request.class, MongoDBConnConfig.DATABASE_TEMP);
+			if(LogAnalysisService.existNewLogs(Constant.PATH_REQUEST))
+			{
+				MongoService<Request> se = new MongoServiceImpl<Request>();
+				se.executeRequestMapReduce(Request.class, MongoDBConnConfig.DATABASE_TEMP);
+			}
 			
-			MongoService<Push> push = new MongoServiceImpl<Push>();
-			push.executeMapReduce(Push.class, MongoDBConnConfig.DATABASE_TEMP,"adid");
+			if(LogAnalysisService.existNewLogs(Constant.PATH_PUSH))
+			{
+				MongoService<Push> push = new MongoServiceImpl<Push>();
+				push.executeMapReduce(Push.class, MongoDBConnConfig.DATABASE_TEMP,"adid");
+			}
 			
-			MongoService<View> view = new MongoServiceImpl<View>();
-			view.executeMapReduce(View.class, MongoDBConnConfig.DATABASE_TEMP,"fid");
+			if(LogAnalysisService.existNewLogs(Constant.PATH_VIEW))
+			{
+				MongoService<View> view = new MongoServiceImpl<View>();
+				view.executeMapReduce(View.class, MongoDBConnConfig.DATABASE_TEMP,"fid");
+			}
 			
-			MongoService<Click> click = new MongoServiceImpl<Click>();
-			click.executeMapReduce(Click.class, MongoDBConnConfig.DATABASE_TEMP,"fid");
-			click.executeMapReduce(Click.class, MongoDBConnConfig.DATABASE_TEMP,"adid");
+			if(LogAnalysisService.existNewLogs(Constant.PATH_CLICK))
+			{
+				MongoService<Click> click = new MongoServiceImpl<Click>();
+				click.executeMapReduce(Click.class, MongoDBConnConfig.DATABASE_TEMP,"fid");
+				click.executeMapReduce(Click.class, MongoDBConnConfig.DATABASE_TEMP,"adid");
+			}
 			
-			MongoService<Download> down = new MongoServiceImpl<Download>();
-			down.executeMapReduce(Download.class, MongoDBConnConfig.DATABASE_TEMP,"fid");
-			down.executeMapReduce(Download.class, MongoDBConnConfig.DATABASE_TEMP,"adid");
+			if(LogAnalysisService.existNewLogs(Constant.PATH_DOWNLOAD))
+			{
+				MongoService<Download> down = new MongoServiceImpl<Download>();
+				down.executeMapReduce(Download.class, MongoDBConnConfig.DATABASE_TEMP,"fid");
+				down.executeMapReduce(Download.class, MongoDBConnConfig.DATABASE_TEMP,"adid");
+			}
 			
-			MongoService<Install> install = new MongoServiceImpl<Install>();
-			install.executeMapReduce(Install.class, MongoDBConnConfig.DATABASE_TEMP,"fid");
-			install.executeMapReduce(Install.class, MongoDBConnConfig.DATABASE_TEMP,"adid");
+			if(LogAnalysisService.existNewLogs(Constant.PATH_INSTALL))
+			{
+				MongoService<Install> install = new MongoServiceImpl<Install>();
+				install.executeMapReduce(Install.class, MongoDBConnConfig.DATABASE_TEMP,"fid");
+				install.executeMapReduce(Install.class, MongoDBConnConfig.DATABASE_TEMP,"adid");
+			}
 			
 		} catch (InterruptedException e) {
 			logger.error(e.getMessage());
@@ -214,7 +233,7 @@ public class StatisticService
 	public static void main(String[] args) 
 	{
 		statistic();
-		dayStatistic(new Date());
+//		dayStatistic(new Date());
 	}
 	
 
