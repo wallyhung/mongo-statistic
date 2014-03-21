@@ -19,9 +19,9 @@ public class HourJob implements Job
 	@Override
 	public void execute(JobExecutionContext context) throws JobExecutionException 
 	{
-		logger.info("每小时的日志分析任务启动了....");
+		logger.error("每小时的日志分析任务启动了....");
 		logger.info("当前的时间为：{}",new Date().getTime());
-		logger.info("Generating report -{}; hour = {} ",context.getJobDetail().getFullName(), context.getJobDetail().getJobDataMap().get("hour"));
+		logger.error("Generating report -{}; hour = {} ",context.getJobDetail().getFullName(), context.getJobDetail().getJobDataMap().get("hour"));
 		
 		//检测是否有请求日志
 		if(LogAnalysisService.existNewLogs(Constant.PATH_REQUEST))
@@ -32,7 +32,7 @@ public class HourJob implements Job
 		}
 		else
 		{
-			logger.info("当前的时间为：{},当前木有新的日志产生，定时任务继续等待....",new Date().getTime());
+			logger.error("当前的时间为：{},当前木有新的日志产生，定时任务继续等待....",new Date().getTime());
 		}
 		
 	}

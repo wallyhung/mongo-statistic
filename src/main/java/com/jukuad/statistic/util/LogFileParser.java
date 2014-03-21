@@ -157,7 +157,7 @@ public class LogFileParser<T> implements Runnable
 			}
 		}
 		count.countDown();
-		logger.info("{}个日志分析任务完成：{}，当前线程运行的任务数为{}。",className,new Date().getTime(),count.getCount());
+		logger.error("日志分析任务完成：{}，当前线程运行的任务数为{}。",className,new Date().getTime(),count.getCount());
 	}
 
 }

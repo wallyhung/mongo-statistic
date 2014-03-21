@@ -1,5 +1,8 @@
 package com.jukuad.statistic.util;
 
+import java.util.Arrays;
+import java.util.List;
+
 import com.jukuad.statistic.log.AdFeedback;
 import com.jukuad.statistic.log.ClientMessage;
 import com.jukuad.statistic.log.SoftFeedback;
@@ -91,6 +94,8 @@ public class ObjectUtil {
 			click.setImei(data.getImei());
 			click.setAdid(data.getAdid());
 			click.setTimestamp(data.getTimestamp());
+			click.setAppid(data.getAppid());
+			click.setType(data.getType());
 			return click;
 		}
 	}
@@ -110,6 +115,7 @@ public class ObjectUtil {
 			down.setImei(data.getImei());
 			down.setAdid(data.getAdid());
 			down.setAppid(data.getAppid());
+			down.setType(data.getType());
 			down.setTimestamp(data.getTimestamp());
 			return down;
 		}
@@ -130,9 +136,33 @@ public class ObjectUtil {
 			install.setImei(data.getImei());
 			install.setAdid(data.getAdid());
 			install.setAppid(data.getAppid());
+			install.setType(data.getType());
 			install.setTimestamp(data.getTimestamp());
 			return install;
 		}
+	}
+	
+	/**
+	 * 比较两个数组的不同元素的个数
+	 * @param list1
+	 * @param list2
+	 * @return
+	 */
+	@SuppressWarnings("rawtypes")
+	public static int getDiffSize(List list1,List list2)
+	{
+		int sum = 0;
+		Object[] array_1 =  list1.toArray();
+		Object[] array_2 =  list2.toArray();
+		Arrays.sort(array_1);
+		Arrays.sort(array_2);
+		
+		int len = array_2.length;  
+		for (int i = 0; i < len; i++)  
+		{  
+		    if (Arrays.binarySearch(array_1, array_2[i]) < 0)  sum++;
+		}  
+		return sum;
 	}
 
 }

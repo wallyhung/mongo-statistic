@@ -14,6 +14,8 @@ public class AdFeedback extends BaseEntity implements Serializable{
     private String   slot_name; //发布id
     private String   imei;
     private String   adid;
+    private int      type;  //广告类型（cpa,cpm）
+    private String   appid;
 
     public String getSlot_name() {
         return slot_name;
@@ -38,4 +40,22 @@ public class AdFeedback extends BaseEntity implements Serializable{
     public void setAdid(String adid) {
         this.adid = adid;
     }
+
+	public int getType() {
+		return type;
+	}
+
+	public void setType(int type) {
+		this.type = type;
+	}
+
+	public String getAppid() {
+		return appid;
+	}
+
+	public void setAppid(String appid) {
+		this.appid = appid;
+	}
+	
+    
 }

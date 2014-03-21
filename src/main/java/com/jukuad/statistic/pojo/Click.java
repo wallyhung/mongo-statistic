@@ -3,8 +3,6 @@ package com.jukuad.statistic.pojo;
 import org.bson.types.ObjectId;
 import org.mongodb.morphia.annotations.Entity;
 import org.mongodb.morphia.annotations.Id;
-import org.mongodb.morphia.annotations.PostPersist;
-import org.mongodb.morphia.annotations.PrePersist;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
@@ -24,18 +22,22 @@ public class Click extends BaseEntity
 	    private String              imei;
 	    /** 广告ID**/
 	    private String              adid;
+	    
+	    private int                 type;
+	    
+	    private String              appid;
 			
 		//morphia中的注解 指示在存入MongoDB之前的操作
-		@PrePersist
-		private void beforeSaving(){
-			System.out.println("即将保存对象:"+ this.toString());
-		}
+//		@PrePersist
+//		private void beforeSaving(){
+//			System.out.println("即将保存对象:"+ this.toString());
+//		}
 		
 		//morphia中的注解 指示在存入MongoDB之后的操作
-		 @PostPersist  
-		 private void afterSaving(){  
-		    System.out.println("对象保存完毕:"+ this.toString());  
-		}  
+//		 @PostPersist  
+//		 private void afterSaving(){  
+//		    System.out.println("对象保存完毕:"+ this.toString());  
+//		}  
 		
 		///~ getter and setter
 		public ObjectId getId() {
@@ -70,4 +72,22 @@ public class Click extends BaseEntity
 			this.adid = adid;
 		}
 
+		public int getType() {
+			return type;
+		}
+
+		public void setType(int type) {
+			this.type = type;
+		}
+
+		public String getAppid() {
+			return appid;
+		}
+
+		public void setAppid(String appid) {
+			this.appid = appid;
+		}
+
+		
+		
 }

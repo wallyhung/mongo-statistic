@@ -2,7 +2,8 @@ package com.jukuad.statistic.service;
 
 import java.util.List;
 
-import com.jukuad.statistic.pojo.DayStatistic;
+import com.jukuad.statistic.pojo.AdDayStatistic;
+import com.jukuad.statistic.pojo.AppDayStatistic;
 import com.jukuad.statistic.pojo.DaySum;
 
 public interface PushService 
@@ -11,7 +12,7 @@ public interface PushService
 	 * 将每天的统计数据入库
 	 * @param list
 	 */
-	void writeDayDataToMysql(List<DayStatistic> list);
+	void writeDayDataToMysql(List<AppDayStatistic> applist,List<AdDayStatistic> adlist);
 	
 	/**
 	 * 保存每天的总数据

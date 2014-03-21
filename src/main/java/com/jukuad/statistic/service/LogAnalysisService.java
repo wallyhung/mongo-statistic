@@ -68,7 +68,7 @@ public class LogAnalysisService
 		int taskNum = getThreadNum();
 		final CountDownLatch count = new CountDownLatch(taskNum);
 		//提交taskNum个日志分析任务
-		logger.info("{}个日志分析任务将运行：{}。",taskNum,new Date().getTime());
+		logger.error("{}个日志分析任务将运行：{}。",taskNum,new Date().getTime());
 		if(existNewLogs(Constant.PATH_REQUEST))
 		{
 			executor.submit(new LogFileParser<ClientMessage>(ClientMessage.class,logpath + Constant.PATH_REQUEST + "/" + TimeUtil.getDayLastHour(new Date()) + ".log",count));

@@ -9,12 +9,12 @@ import org.mongodb.morphia.annotations.Property;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 /**
- * 每天总统计结果
+ * 每天每个应用的统计结果
  * @author Administrator
  *
  */
-@Entity(value="sum", noClassnameStored = true)
-public class DaySum extends BaseEntity
+@Entity(value="ad_day", noClassnameStored = true)
+public class AdDayStatistic extends BaseEntity
 {
 	 //morphia中的注解 标明该key为标识字段(MongoDB中特殊的ObjectId字段)
 	@Id
@@ -22,12 +22,14 @@ public class DaySum extends BaseEntity
 	@JsonIgnore(value= true)
 	private ObjectId id;
 	
+    private long                request;
     private long                push;
     private long                view;
     private long                click;
-    private long                new_a;
-    private long                alive;  //终端数
-    
+    private long                download;
+    private long                install;
+    private long                alive; //终端数
+    private String              adid;
     @Property(value="day")
     private String                day;
 
@@ -39,6 +41,15 @@ public class DaySum extends BaseEntity
 	public void setId(ObjectId id) {
 		this.id = id;
 	}
+
+	public long getRequest() {
+		return request;
+	}
+
+	public void setRequest(long request) {
+		this.request = request;
+	}
+
 	
 	public long getPush() {
 		return push;
@@ -56,6 +67,7 @@ public class DaySum extends BaseEntity
 		this.view = view;
 	}
 
+
 	public long getClick() {
 		return click;
 	}
@@ -64,12 +76,20 @@ public class DaySum extends BaseEntity
 		this.click = click;
 	}
 
-	public long getNew_a() {
-		return new_a;
+	public long getDownload() {
+		return download;
 	}
 
-	public void setNew_u(long new_a) {
-		this.new_a = new_a;
+	public void setDownload(long download) {
+		this.download = download;
+	}
+
+	public long getInstall() {
+		return install;
+	}
+
+	public void setInstall(long install) {
+		this.install = install;
 	}
 
 	public long getAlive() {
@@ -78,6 +98,14 @@ public class DaySum extends BaseEntity
 
 	public void setAlive(long alive) {
 		this.alive = alive;
+	}
+
+	public String getAdid() {
+		return adid;
+	}
+
+	public void setAdid(String adid) {
+		this.adid = adid;
 	}
 
 	public String getDay() {

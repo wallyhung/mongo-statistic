@@ -15,6 +15,7 @@ public class SoftFeedback extends BaseEntity implements Serializable{
     private String   imei;
     private String   adid;
     private String   appid;
+    private int      type;
     public String getSlot_name() {
         return slot_name;
     }
@@ -46,4 +47,12 @@ public class SoftFeedback extends BaseEntity implements Serializable{
         public void setAppid(String appid) {
         this.appid = appid;
     }
+
+		public int getType() {
+			return type;
+		}
+
+		public void setType(int type) {
+			this.type = type;
+		}
 }
