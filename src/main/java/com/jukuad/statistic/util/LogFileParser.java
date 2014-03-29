@@ -2,11 +2,12 @@ package com.jukuad.statistic.util;
 
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.FileReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
 
@@ -53,22 +54,23 @@ public class LogFileParser<T> implements Runnable
 		
 		//创建Jackson全局的objectMapper 它既可以用于序列化 也可以用于反序列化
 		ObjectMapper objectMapper = new ObjectMapper();
+	    objectMapper.configure(JsonParser.Feature.ALLOW_UNQUOTED_CONTROL_CHARS, true);
+        objectMapper.configure(JsonParser.Feature.ALLOW_SINGLE_QUOTES, true);
 		//得到JSON处理的工厂对象
 		JsonFactory jsonFactory= objectMapper.getFactory();
 		
 		//进入读文件阶段
-		FileReader fr = null;
+		InputStreamReader in = null;
 		Integer idx = 1;
 		List<T> list = new ArrayList<T>();
 		try 
 		{
-			fr = new FileReader(new File(path));
-			BufferedReader br = new BufferedReader(fr);
+			in = new InputStreamReader(new FileInputStream(new File(path)), "UTF-8");
+			BufferedReader br = new BufferedReader(in);
 			String currentJsonStr= null;
 			try {
 				//按行读取
 				while((currentJsonStr = br.readLine()) != null){
-					currentJsonStr = new String(currentJsonStr.getBytes(), "UTF-8");
 					if(currentJsonStr.trim().equals("")) continue;
 					//进入反序列化阶段
 					//通过JSON处理工厂对象创建JSON分析器
@@ -82,14 +84,13 @@ public class LogFileParser<T> implements Runnable
 						
 					} catch (Exception e) 
 					{
-						logger.error("json数据解析错误在第{}行，具体的内容为：{}",idx,currentJsonStr);
+						logger.error("{}：日志解析数据错误在第{}行，具体的内容为：{}",className,idx,currentJsonStr);
 						continue;
 					}
 					
 					idx++;
 				}
 			} catch (IOException e) {
-				
 				logger.error(e.getMessage());
 			}
 			finally{
@@ -100,9 +101,9 @@ public class LogFileParser<T> implements Runnable
 	                	logger.error("关闭读取文件的缓冲流出错：{}。",e1.getMessage());
 	                }
 	            }
-				if (fr != null) {
+				if (in != null) {
 	                try {
-	                    fr.close();
+	                    in.close();
 	                } catch (IOException e2) {
 	                	logger.error("关闭读取文件的缓冲流出错：{}。",e2.getMessage());
 	                }
@@ -110,6 +111,8 @@ public class LogFileParser<T> implements Runnable
 			}
 		} catch (FileNotFoundException e) {
 			logger.error(e.getMessage());
+		} catch (UnsupportedEncodingException e3) {
+			logger.error(e3.getMessage());
 		} 
 		return (ArrayList<T>) list;
 	}
@@ -149,15 +152,15 @@ public class LogFileParser<T> implements Runnable
 			Key<BaseEntity> backkey = back.save(entity);
 			if (key != null && backkey != null)
 			{
-			logger.info("已存入:"+ key.getId() + ",元素序列:");
+			    logger.debug("已存入{}数据，keyid：{}。",className,key.getId());
 			}else
 			{
-				logger.error("元素序列"+ "发生错误,JSON:");
+				logger.error("数据保存mongodb出错：{}。",t);
 				break;
 			}
 		}
 		count.countDown();
-		logger.error("日志分析任务完成：{}，当前线程运行的任务数为{}。",className,new Date().getTime(),count.getCount());
+		logger.info("日志分析任务完成：{}，当前线程运行的任务数为{}。",className,count.getCount());
 	}
 
 }

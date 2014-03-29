@@ -27,6 +27,10 @@ public class AdResult extends BaseEntity
     private long                download;
     private long                install;
     private String              adid;
+    
+    
+    private String hour;
+    
 
     ///~ getter and setter
 	public ObjectId getId() {
@@ -92,5 +96,15 @@ public class AdResult extends BaseEntity
 	public void setAdid(String adid) {
 		this.adid = adid;
 	}
+
+	public String getHour() {
+		return hour;
+	}
+
+	public void setHour(String hour) {
+		this.hour = hour;
+	}
+	
+	
 
 }

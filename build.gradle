@@ -2,16 +2,20 @@ apply plugin: 'java'
 apply plugin: 'eclipse'
 apply plugin: 'eclipse-wtp'
 apply plugin: 'war'
+apply plugin: 'application'
 
 sourceCompatibility = 1.6
-version = '0.1.0'
+mainClassName = "com.jukuad.statistic.config.Application"
+
 jar {
-    // baseName = 'adstatistic'
-    // version =  version
-    
-    manifest {
-        attributes 'Implementation-Title': 'adstatistic', 'Implementation-Version': version
-    }
+    baseName = 'adstatistic'
+    version =  '0.1.0'
+    manifest.attributes provider: 'www.dafada.com'
+}
+
+compileJava.options.encoding = 'UTF-8'
+tasks.withType(Compile) {
+    options.encoding = "UTF-8"
 }
 
 repositories {
@@ -21,16 +25,17 @@ repositories {
 dependencies 
 {
     compile('org.mongodb:mongo-java-driver:2.11.4',
-            'org.mongodb.morphia:morphia:0.106',
+            'org.mongodb.morphia:morphia:0.107',
             'mysql:mysql-connector-java:5.1.29',
-         // 'commons-dbcp:commons-dbcp:1.4',
+            'commons-dbcp:commons-dbcp:1.4',
             'com.fasterxml.jackson.core:jackson-core:2.3.0',
             'com.fasterxml.jackson.core:jackson-databind:2.3.0',
             'org.slf4j:slf4j-api:1.7.6',
-            'org.mongodb.morphia:morphia-logging-slf4j:0.106',
+            'org.mongodb.morphia:morphia-logging-slf4j:0.107',
             'ch.qos.logback:logback-core:1.1.1',
             'ch.qos.logback:logback-classic:1.1.1',
             'quartz:quartz:1.5.2')
+    compile files('lib/ne81commons-1.0.jar')
     testCompile('junit:junit:4.11')
 }
 
@@ -45,7 +50,4 @@ uploadArchives {
        }
     }
 }
-//compileJava.options.encoding = 'UTF-8'
-tasks.withType(Compile) {
-    options.encoding = 'UTF-8'
-}
+

@@ -6,6 +6,7 @@ import java.util.Map;
 
 import org.mongodb.morphia.query.Query;
 
+import com.jukuad.statistic.pojo.AdResult;
 import com.jukuad.statistic.pojo.DaySum;
 
 
@@ -34,4 +35,27 @@ public interface BaseService<T>
 	 * @return
 	 */
 	DaySum queryDaySum(Date date);
+	
+	/**
+	 * 查询最新的一条广告临时统计数据
+	 * @param database
+	 * @return
+	 */
+	AdResult queryLastData(String database);
+	
+	/**
+	 * 验证库最新广告临时数据是否小于小时统计开始时间
+	 * @param database
+	 * @param startLongTime
+	 * @return
+	 */
+	boolean validateStatisticLastHourLog(String database,long startLongTime);
+	
+	/**
+	 * 查询某一天的所有临时统计数据
+	 * @param database
+	 * @param date
+	 * @return
+	 */
+	List<T> queryTempStatisticList(Class<T> name,String database,Date date);
 }

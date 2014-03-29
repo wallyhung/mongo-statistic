@@ -27,6 +27,7 @@ public class Constant {
 	
 	public final static long TEMPSTAMP_ONE = 86400000;
 	public final static long TEMPSTAMP_THREE = 259200000;
+	public final static long TEMPSTAMP_HOUR = 3600000;
 
 	public final static int CPA = 1;
 	public final static int CPC = 2;

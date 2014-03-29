@@ -33,7 +33,7 @@ public class AppMongService<T> implements MongoService<T>
 {
 	private static final Logger logger = LoggerFactory.getLogger(AppMongService.class);
 	@Override
-	public void executeMapReduce(Class<T> name, String database) 
+	public void executeMapReduce(Class<T> name, String database,String hour) 
 	{
 		String map = "function(){" 
 	               + "emit(this.fid, {count : 1,time : this.time})"
@@ -72,7 +72,7 @@ public class AppMongService<T> implements MongoService<T>
 	  DBObject query = new BasicDBObject(); 
 	  MapReduceOutput out = ds.getCollection(name).mapReduce(map, reduce, outputCollection, query);
 	  //处理查询结果并入库
-	  analyzeMapReduceResult(name,out);
+	  analyzeMapReduceResult(name,out,hour);
 	}
 
 	/**
@@ -80,7 +80,7 @@ public class AppMongService<T> implements MongoService<T>
 	 * @param name
 	 * @param out
 	 */
-	private void analyzeMapReduceResult(Class<T> name, MapReduceOutput out) 
+	private void analyzeMapReduceResult(Class<T> name, MapReduceOutput out,String hour) 
 	{
 		DBCollection dc = out.getOutputCollection();
         DBCursor cursor = dc.find();
@@ -103,66 +103,88 @@ public class AppMongService<T> implements MongoService<T>
 				res.setRequest(count.longValue());
 				res.setFirst( (Long) valueOb.get("time"));
 				res.setTimestamp(System.currentTimeMillis());
+				res.setHour(hour);
 				Key<AppResult> key = statistic.save(res);
-				logger.info("分析请求数，并入库：{}",key.getId());
+				logger.debug("分析请求数，并入库：{}",key.getId());
 			}
 			else
 			{
 				String count = String.valueOf(valueOb.get("count"));
-				Query<AppResult> query = statistic.createQuery(AppResult.class).field("fid").equal(id);
+				Query<AppResult> query = statistic.createQuery(AppResult.class).field("fid").equal(id).field("hour").equal(hour);
 				UpdateOperations<AppResult> ops = statistic.createUpdateOperations(AppResult.class).set("view", Double.valueOf(count).longValue());
 				statistic.update(query, ops);
-				logger.info("分析展示数，并入库：{}",ops.toString());
+				logger.debug("分析展示数，并更新：{}",ops.toString());
 			}
 		}
 	}
 	
 	@Override
-	public void executeAppByAdTypeMapReduce(Class<T> name, String database) 
+	public void executeAppByAdTypeMapReduce(Class<T> name, String database,String hour) 
 	{
-		String map = "function(){" 
-	               + "emit(this.fid, {count : 1,adid:this.adid,type:this.type, appid:this.appid})"
-				   + "}";
+		String map = "function(){" +
+						  "var key = this.fid;"+
+						  "var value = {count:1,wall:0,oth:0};"+
+					      "if(this.adid == this.appid) value.oth = 1;"+
+						  "else value.wall = 1;"+
+						  "emit(key,value);"+
+					  "}";
 		
-		String reduce = "function (key, values) {"
-				  + "var res = {count:0,wall:0,oth:0};"
-				  + "for (var i = 0; i < values.length; i++) {"
-				  + "res.count += values[i].count;"
-			  		+ "if(values[i].adid == values[i].appid) res.wall += values[i].count;"
-					+ "else res.oth += values[i].count;"
-			  	  + "}"
-				   + "return res; "
-				  + "}";
+		String reduce = "function (key, values) {"+
+							"var res = {count:0,wall:0,oth:0};"+
+							"values.forEach(function(val) {"+
+								"res.count   += val.count;"+
+								"res.wall += val.wall;"+
+								"res.oth += val.oth;"+
+							"});"+
+						    "res.on_reduce = 1;"+
+							"return res;"+	
+						"}";
+		
+//		 String finalize =  "function (key, reduced) {"+
+//					"if (reduced.on_reduce != 1) {"+
+//					"reduced.cpc = 0;"+
+//					"reduced.wall=0;"+
+//					"reduced.oth =0;"+
+//					"}"+
+//					"return reduced;"+
+//				"}";
 		
 		if(Click.class.equals(name))
 		{
-			map = "function(){" 
-		               + "emit(this.fid, {count : 1,adid:this.adid,type:this.type, appid:this.appid})"
-					   + "}";
-			reduce = "function (key, values) {"
-					  + "var res = {count:0,cpc:0,wall:0,oth:0};"
-					  + "for (var i = 0; i < values.length; i++) {"
-					  + "res.count += values[i].count;"
-					  + "if(values[i].type == 1){"
-				  		+ "if(values[i].adid == values[i].appid) res.wall += values[i].count;"
-						+ "else res.oth += values[i].count;"
-				  	  + "}"
-					  + "else if(values[i].type == 2){"
-					    + "res.cpc += values[i].count;"
-					  + "}"
-					  + "}"
-					   + "return res; "
-					  + "}";
+			map = "function(){" +
+					  "var key = this.fid;"+
+					  "var value = {count:1,wall:0,oth:0,cpc:0};"+
+					  "if(this.type==2) value.cpc = 1;"+
+					  "if(this.type==1)"+
+					  "{"+
+					      "if(this.adid == this.appid) value.oth = 1;"+
+						  "else value.wall = 1;"+
+					  "}"+
+					  "emit(key,value);"+
+				  "}";
+			
+			reduce = "function (key, values) {"+
+						"var res = {count:0,wall:0,oth:0,cpc:0};"+
+						"values.forEach(function(val) {"+
+							"res.count   += val.count;"+
+							"res.cpc += val.cpc;"+ 
+							"res.wall += val.wall;"+
+							"res.oth += val.oth;"+
+						"});"+
+					    "res.on_reduce = 1;"+
+						"return res;"+	
+					"}";
+			
+			
 		}
-		
-		String outputCollection = "tmp";
+	   String outputCollection = "tmp";
 	   //获取数据库一个实例
 	   Datastore ds = MongoDBDataStore.getDBInstance(database);  
 	   DBObject query = new BasicDBObject(); 
 	   MapReduceOutput out = ds.getCollection(name).mapReduce(map, reduce, outputCollection, query);
 	 
 	   //处理查询结果并入库
-	   analyzeAppMapReduceResult(name,out);
+	   analyzeAppMapReduceResult(name,out,hour);
 	}
 	
 	/**
@@ -170,7 +192,7 @@ public class AppMongService<T> implements MongoService<T>
 	 * @param name
 	 * @param out
 	 */
-	private void analyzeAppMapReduceResult(Class<T> name, MapReduceOutput out) 
+	private void analyzeAppMapReduceResult(Class<T> name, MapReduceOutput out,String hour) 
 	{
 		Datastore ds = MongoDBDataStore.getDBInstance(MongoDBConnConfig.DATABASE_STATISTIC); 
 		DBCollection dc = out.getOutputCollection();
@@ -182,7 +204,7 @@ public class AppMongService<T> implements MongoService<T>
 			String id = (String) dbObject.get("_id");
 			DBObject value = (DBObject) dbObject.get("value");
 			
-			Query<AppResult> query = ds.createQuery(AppResult.class).field("fid").equal(id);
+			Query<AppResult> query = ds.createQuery(AppResult.class).field("fid").equal(id).field("hour").equal(hour);
 			UpdateOperations<AppResult> ops = null;
 			
 			String wall = String.valueOf(value.get("wall"));
@@ -204,7 +226,7 @@ public class AppMongService<T> implements MongoService<T>
 				}
 				else attach = new Attach(Double.valueOf(cpc).longValue(), Double.valueOf(wall).longValue(), Double.valueOf(oth).longValue());
 				ops = ds.createUpdateOperations(AppResult.class).set("click", attach);
-				logger.info("分析广告点击数，并入库：{}",ops.toString());
+				logger.debug("分析广告点击数，并更新：{}",ops.toString());
 			}
 			if(Download.class.equals(name))
 			{
@@ -219,7 +241,7 @@ public class AppMongService<T> implements MongoService<T>
 				}
 				else attach = new Attach(Double.valueOf(wall).longValue(), Double.valueOf(oth).longValue());
 				ops = ds.createUpdateOperations(AppResult.class).set("download", attach);
-				logger.info("分析广告下载数，并入库：{}",ops.toString());
+				logger.debug("分析广告下载数，并更新：{}",ops.toString());
 			}
 			if(Install.class.equals(name))
 			{
@@ -234,7 +256,7 @@ public class AppMongService<T> implements MongoService<T>
 				}
 				else attach = new Attach(Double.valueOf(wall).longValue(), Double.valueOf(oth).longValue());
 				ops = ds.createUpdateOperations(AppResult.class).set("install", attach);
-				logger.info("分析广告安装数，并入库：{}",ops.toString());
+				logger.debug("分析广告安装数，并更新：{}",ops.toString());
 			}
 			ds.update(query, ops);
 		}
@@ -328,7 +350,7 @@ public class AppMongService<T> implements MongoService<T>
         DBCursor cursor = dc.find();
         //获取一个数据库实例
         Datastore statistic = MongoDBDataStore.getDBInstance(MongoDBConnConfig.DATABASE_STATISTIC);
-        logger.info("{}某天的数据mapreduce执行状况：{}....",new Date().getTime(),dc.getStats());
+        logger.info("{}：一天应用数据mapreduce执行状况：{}....",TimeUtil.getDay(date),dc.getStats());
         
         while (cursor.hasNext()) 
         {
@@ -369,7 +391,7 @@ public class AppMongService<T> implements MongoService<T>
 			}
 			
 			String id = (String) dbObject.get("_id");
-			if(id == null) res.setFid("wwwwww");
+			if(id == null) res.setFid("假数据");
 			else res.setFid(id);
 			res.setRequest(Double.valueOf(request).longValue());
 			res.setView(Double.valueOf(view).longValue());
@@ -378,13 +400,13 @@ public class AppMongService<T> implements MongoService<T>
 			res.setTimestamp(System.currentTimeMillis());
 			
 			//获取用户的日活、留存、新增
-			Integer[] size = this.statisticDayUserData(date, id, MongoDBConnConfig.DATABASE_TEMP);
+			Integer[] size = this.statisticDayUserData(date, id, MongoDBConnConfig.DATABASE_DATA);
 			res.setAlive(size[0]);
 			res.setRemain(size[1]);
 			res.setNew_u(size[2]);
 			
 			Key<AppDayStatistic> key = statistic.save(res);
-			logger.info("{}:{}分析临时数据汇总，并入库：{}",AppDayStatistic.class,date,key.getId());
+			logger.debug("{}:{}分析临时数据汇总，并入库：{}","AppDayStatistic",TimeUtil.getDay(date),key.getId());
         }
 	}
 	
@@ -402,24 +424,30 @@ public class AppMongService<T> implements MongoService<T>
 		DBObject downloadOb = (DBObject) valueOb.get("download");
 		DBObject installOb = (DBObject) valueOb.get("install");
 		
-		String click_cpc = String.valueOf(clickOb.get("cpc"));
-		String click_wall = String.valueOf(clickOb.get("wall"));
-		String click_oth = String.valueOf(clickOb.get("oth"));
+		if(clickOb != null)
+		{
+			String click_cpc = String.valueOf(clickOb.get("cpc"));
+			String click_wall = String.valueOf(clickOb.get("wall"));
+			String click_oth = String.valueOf(clickOb.get("oth"));
+			Attach click_Attach = new Attach(Double.valueOf(click_cpc).longValue(), Double.valueOf(click_wall).longValue(), Double.valueOf(click_oth).longValue());
+			res.setClick(click_Attach);
+		}
 		
-		String down_wall = String.valueOf(downloadOb.get("wall"));
-		String down_oth = String.valueOf(downloadOb.get("oth"));
+		if(downloadOb != null)
+		{
+			String down_wall = String.valueOf(downloadOb.get("wall"));
+			String down_oth = String.valueOf(downloadOb.get("oth"));
+			Attach down_Attach = new Attach(Double.valueOf(down_wall).longValue(), Double.valueOf(down_oth).longValue());
+			res.setDownload(down_Attach);
+		}
 		
-		String ins_wall = String.valueOf(installOb.get("wall"));
-		String ins_oth = String.valueOf(installOb.get("oth"));
-		
-		Attach click_Attach = new Attach(Double.valueOf(click_cpc).longValue(), Double.valueOf(click_wall).longValue(), Double.valueOf(click_oth).longValue());
-		Attach down_Attach = new Attach(Double.valueOf(down_wall).longValue(), Double.valueOf(down_oth).longValue());
-		Attach ins_Attach = new Attach(Double.valueOf(ins_wall).longValue(), Double.valueOf(ins_oth).longValue());
-		
-		res.setClick(click_Attach);
-		res.setDownload(down_Attach);
-		res.setInstall(ins_Attach);
-		
+		if(installOb != null)
+		{
+			String ins_wall = String.valueOf(installOb.get("wall"));
+			String ins_oth = String.valueOf(installOb.get("oth"));
+			Attach ins_Attach = new Attach(Double.valueOf(ins_wall).longValue(), Double.valueOf(ins_oth).longValue());
+			res.setInstall(ins_Attach);
+		}
 		return res;
 	}
 
@@ -468,9 +496,7 @@ public class AppMongService<T> implements MongoService<T>
 		
 		//先获取当天的上一天到前8天的日活用户
 		Date before = TimeUtil.getEightDaysBefore(date);
-		Date last = TimeUtil.getLastDayEnd(date);
-		
-		query.append("time", new BasicDBObject().append("$gte", TimeUtil.getDayStart(before).getTime()).append("$lt", TimeUtil.getDayEnd(last).getTime()));
+		query.append("time", new BasicDBObject().append("$gte", TimeUtil.getDayStart(before).getTime()).append("$lt", TimeUtil.getLastDayEnd(date).getTime()));
 		List<Request> elist =  ds.getCollection(Request.class).distinct("imei", query);
 		size[2] = ObjectUtil.getDiffSize(elist, list);
 				
@@ -495,6 +521,5 @@ public class AppMongService<T> implements MongoService<T>
 		query.field("day").equal(TimeUtil.getDay(date));
 		return query.asList();
 	}
-
 
 }

@@ -34,7 +34,7 @@ public class AdMongService<T> implements MongoService<T>
 {
 	private static final Logger logger = LoggerFactory.getLogger(AdMongService.class);
 	@Override
-	public void executeMapReduce(Class<T> name, String database) 
+	public void executeMapReduce(Class<T> name, String database,String hour) 
 	{
 		String map = "function(){" 
 	               + "emit(this.adid, {count : 1})"
@@ -49,13 +49,30 @@ public class AdMongService<T> implements MongoService<T>
 					  +"}";
 		String outputCollection = "tmp";
 		
+		//下载或安装是统计应用id，算着广告的效果数
+		if(Install.class.equals(name) || Download.class.equals(name))
+		{
+			map = "function(){" 
+		               + "emit(this.appid, {count : 1})"
+					   + "}";
+			
+			reduce = "function (key, values) {"
+						  + "var res = {count:0};"
+						  + "values.forEach(function(val) {"
+						  + "res.count += val.count; "
+						  + "});"
+						  + "return res;"
+						  +"}";
+			
+		}
+		
 		//获取数据库一个实例
         Datastore ds = MongoDBDataStore.getDBInstance(database);  
         DBObject query = new BasicDBObject(); 
         MapReduceOutput out = ds.getCollection(name).mapReduce(map, reduce, outputCollection, query);
         
         //处理查询结果并入库
-        analyzeMapReduceResult(name,out);
+        analyzeMapReduceResult(name,out,hour);
 	}
 
 	/**
@@ -63,7 +80,7 @@ public class AdMongService<T> implements MongoService<T>
 	 * @param name
 	 * @param out
 	 */
-	private void analyzeMapReduceResult(Class<T> name, MapReduceOutput out) 
+	private void analyzeMapReduceResult(Class<T> name, MapReduceOutput out,String hour) 
 	{
 		Datastore ds = MongoDBDataStore.getDBInstance(MongoDBConnConfig.DATABASE_STATISTIC); 
 		DBCollection dc = out.getOutputCollection();
@@ -83,25 +100,46 @@ public class AdMongService<T> implements MongoService<T>
 				res.setAdid(id);
                 res.setPush(Double.valueOf(count).longValue());
 				res.setTimestamp(System.currentTimeMillis());
+				res.setHour(hour);
 				Key<AdResult> key = ds.save(res);
-				logger.info("分析广告推送数，并入库：{}",key.getId());
+				logger.debug("分析广告推送数，并入库：{}",key.getId());
 			}
 			else
 			{
-				Query<AdResult> query = ds.createQuery(AdResult.class).field("adid").equal(id);
+				Query<AdResult> query = ds.createQuery(AdResult.class).field("adid").equal(id).field("hour").equal(hour);
 				UpdateOperations<AdResult> ops = null;
-				if(View.class.equals(name)) ops = ds.createUpdateOperations(AdResult.class).set("view", Double.valueOf(count).longValue());
-				if(Click.class.equals(name)) ops = ds.createUpdateOperations(AdResult.class).set("click", Double.valueOf(count).longValue());
-				if(Download.class.equals(name)) ops = ds.createUpdateOperations(AdResult.class).set("download", Double.valueOf(count).longValue());
-				if(Install.class.equals(name)) ops = ds.createUpdateOperations(AdResult.class).set("install", Double.valueOf(count).longValue());
-				ds.update(query, ops);
+				if(Download.class.equals(name))
+				{
+					//查询的结果是否存在此广告的下载，此结果可能木有点击以前的数，只有下载、安装（应用墙的应用）
+					AdResult res = query.asList() != null && query.asList().size() > 0 ? query.asList().get(0) : null;
+					if(res == null)
+					{
+						res = new AdResult();
+						res.setDownload(Double.valueOf(count).longValue());
+						res.setAdid(id);
+						res.setHour(hour);
+						res.setTimestamp(System.currentTimeMillis());
+						Key<AdResult> key = ds.save(res);
+						logger.debug("分析广告下载数，查询到此应用的广告id不存在，新建并入库：{}",key.getId());
+					}else
+					{
+						ops = ds.createUpdateOperations(AdResult.class).set("download", Double.valueOf(count).longValue());
+						ds.update(query, ops);
+					}
+				}
+				else
+				{
+					if(View.class.equals(name)) ops = ds.createUpdateOperations(AdResult.class).set("view", Double.valueOf(count).longValue());
+					if(Click.class.equals(name)) ops = ds.createUpdateOperations(AdResult.class).set("click", Double.valueOf(count).longValue());
+					if(Install.class.equals(name)) ops = ds.createUpdateOperations(AdResult.class).set("install", Double.valueOf(count).longValue());
+					ds.update(query, ops);
+				}
 			}
-			
 		}
 	}
 	
 	@Override
-	public void executeAppByAdTypeMapReduce(Class<T> name, String database) {
+	public void executeAppByAdTypeMapReduce(Class<T> name, String database,String hour) {
 	}
 	
 	
@@ -162,7 +200,7 @@ public class AdMongService<T> implements MongoService<T>
         DBCursor cursor = dc.find();
         //获取一个数据库实例
         Datastore statistic = MongoDBDataStore.getDBInstance(MongoDBConnConfig.DATABASE_STATISTIC);
-        logger.info("{}某天的数据mapreduce执行状况：{}....",new Date().getTime(),dc.getStats());
+        logger.info("{}:一天的广告数据mapreduce执行状况：{}....",TimeUtil.getDay(date),dc.getStats());
         
         while (cursor.hasNext()) 
         {
@@ -188,11 +226,11 @@ public class AdMongService<T> implements MongoService<T>
 			res.setTimestamp(System.currentTimeMillis());
 			
 			//获取广告的终端数
-			Integer[] size = this.statisticDayUserData(date, id, MongoDBConnConfig.DATABASE_TEMP);
+			Integer[] size = this.statisticDayUserData(date, id, MongoDBConnConfig.DATABASE_DATA);
 			res.setAlive(size[0]);
 			
 			Key<AdDayStatistic> key = statistic.save(res);
-			logger.info("{}:{}分析临时数据汇总，并入库：{}",AdDayStatistic.class,date,key.getId());
+			logger.debug("{}:{}分析临时数据汇总，并入库：{}","AdDayStatistic",TimeUtil.getDay(date),key.getId());
         }
 	}
 	
@@ -294,7 +332,7 @@ public class AdMongService<T> implements MongoService<T>
         DBCursor cursor = dc.find();
         //获取一个数据库实例
         Datastore statistic = MongoDBDataStore.getDBInstance(MongoDBConnConfig.DATABASE_STATISTIC);
-        logger.info("{}天广告的总统计，mapreduce执行状况：{}",new Date(),dc.getStats());
+        logger.info("{}：一天的广告的总统计，mapreduce执行状况：{}",TimeUtil.getDay(date),dc.getStats());
         
         while (cursor.hasNext()) 
         {
@@ -320,7 +358,7 @@ public class AdMongService<T> implements MongoService<T>
 			logger.info("分析一天新增的应用数：{}。",count);
 			res.setNew_u(count);
 			Key<DaySum> key = (Key<DaySum>) statistic.save(res);
-			logger.info("分析一天广告的总计数据，并入库：{}",key.getId());
+			logger.debug("分析一天广告的总计数据，并入库：{}",key.getId());
 		}
 		
 	}

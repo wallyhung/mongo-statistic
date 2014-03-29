@@ -13,7 +13,7 @@ public interface MongoService<T>
 	 * @param name
 	 * @param database  map collection
 	 */
-	void executeMapReduce(Class<T> name,String database);
+	void executeMapReduce(Class<T> name,String database,String hour);
 	
 	/**
 	 * 应用的点击、下载、安装的统计
@@ -23,7 +23,7 @@ public interface MongoService<T>
 	 * @param name
 	 * @param database
 	 */
-	void executeAppByAdTypeMapReduce(Class<T> name,String database);
+	void executeAppByAdTypeMapReduce(Class<T> name,String database,String hour);
 	
 	/**
 	 * 对某一天的临时数据做汇总map

@@ -43,6 +43,9 @@ public class AppResult extends BaseEntity
     @JsonDeserialize(using= DateDeserializer.class)
     @Property(value="first")
     private long                first;
+    
+    private String hour;
+    
 
     ///~ getter and setter
 	public ObjectId getId() {
@@ -117,6 +120,14 @@ public class AppResult extends BaseEntity
 
 	public void setFirst(long first) {
 		this.first = first;
+	}
+
+	public String getHour() {
+		return hour;
+	}
+
+	public void setHour(String hour) {
+		this.hour = hour;
 	}
 	
 

@@ -18,6 +18,14 @@ public class MysqlConnection
 	private final static Logger logger = LoggerFactory.getLogger(MysqlConnection.class);
 	private static Connection connection = null;
 	
+	public static String driver;
+	public static String url;
+	public static String usr;
+	public static String psw;
+	public static String logName;
+	
+	
+	
 	
 	public static Connection getConnection()
 	{

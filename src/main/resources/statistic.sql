@@ -2,7 +2,7 @@
 SQLyog Ultimate v11.11 (64 bit)
 MySQL - 5.5.35-MariaDB : Database - statistic
 *********************************************************************
-*/
+*/
 
 /*!40101 SET NAMES utf8 */;
 
@@ -21,7 +21,7 @@ USE `statistic`;
 DROP TABLE IF EXISTS `ad_day_report`;
 
 CREATE TABLE `ad_day_report` (
-  `oid` varchar(30) NOT NULL COMMENT '对应mongo库的objectid',
+  `oid` varchar(50) NOT NULL COMMENT '对应mongo库的objectid',
   `adid` varchar(32) NOT NULL COMMENT '广告ID',
   `push` bigint(20) DEFAULT '0' COMMENT '推送数',
   `view` bigint(20) DEFAULT '0' COMMENT '展示数',
@@ -45,7 +45,7 @@ UNLOCK TABLES;
 DROP TABLE IF EXISTS `app_day_report`;
 
 CREATE TABLE `app_day_report` (
-  `oid` varchar(30) NOT NULL COMMENT '对应mongo库的objectid',
+  `oid` varchar(50) NOT NULL COMMENT '对应mongo库的objectid',
   `fid` varchar(32) NOT NULL COMMENT '发布ID',
   `request` bigint(20) DEFAULT '0' COMMENT '请求数',
   `view` bigint(20) DEFAULT '0' COMMENT '展示数',
@@ -77,7 +77,7 @@ UNLOCK TABLES;
 DROP TABLE IF EXISTS `day_sum`;
 
 CREATE TABLE `day_sum` (
-  `oid` varchar(30) NOT NULL COMMENT '对应mongo主键objectid',
+  `oid` varchar(50) NOT NULL COMMENT '对应mongo主键objectid',
   `new_a` bigint(20) DEFAULT '0' COMMENT '新增应用数',
   `push` bigint(20) DEFAULT '0' COMMENT '推送数',
   `view` bigint(20) DEFAULT '0' COMMENT '展示数',

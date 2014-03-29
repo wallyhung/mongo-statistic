@@ -1,7 +1,6 @@
 package com.jukuad.statistic.service;
 
 import java.io.File;
-import java.util.Date;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -17,7 +16,6 @@ import com.jukuad.statistic.log.ClientMessage;
 import com.jukuad.statistic.log.SoftFeedback;
 import com.jukuad.statistic.util.Constant;
 import com.jukuad.statistic.util.LogFileParser;
-import com.jukuad.statistic.util.TimeUtil;
 
 public class LogAnalysisService 
 {
@@ -30,73 +28,79 @@ public class LogAnalysisService
 	
 	/**
 	 * 检查是否有新的日志文件
+	 * @param type 日志类型
+	 * @param hour 小时字符串
 	 * @return
 	 */
-	public static boolean existNewLogs(String type)
+	public static boolean existNewLogs(String type,String hour)
 	{
 		boolean bool = false;
-		String path = logpath + type + "/" + TimeUtil.getDayLastHour(new Date()) + ".log";
-		File file = new File(path);
+		File file = new File(getLogPath(type, hour));
 		if(file.exists()) bool = true;
 		return bool;
 	}
 	
-	public static int getThreadNum()
+	public static String getLogPath(String type,String hour)
+	{
+		return logpath + type + "/" + hour + ".log";
+	}
+	
+	public static int getThreadNum(String hour)
 	{
 		int num = 0;
-		if(existNewLogs(Constant.PATH_REQUEST)) num++;
+		if(existNewLogs(Constant.PATH_REQUEST,hour)) num++;
 		
-		if(existNewLogs(Constant.PATH_PUSH)) num++;
+		if(existNewLogs(Constant.PATH_PUSH,hour)) num++;
 		
-		if(existNewLogs(Constant.PATH_VIEW)) num++;
+		if(existNewLogs(Constant.PATH_VIEW,hour)) num++;
 		
-		if(existNewLogs(Constant.PATH_CLICK)) num++;
+		if(existNewLogs(Constant.PATH_CLICK,hour)) num++;
 		
-		if(existNewLogs(Constant.PATH_DOWNLOAD)) num++;
+		if(existNewLogs(Constant.PATH_DOWNLOAD,hour)) num++;
 		
-		if(existNewLogs(Constant.PATH_INSTALL)) num++;
+		if(existNewLogs(Constant.PATH_INSTALL,hour)) num++;
 		return num;
 	}
 	
 	
-	public static CountDownLatch analyzeLog()
+	public static CountDownLatch analyzeLog(String hour)
 	{
 		//清理缓存数据库
 		Datastore ds = MongoDBDataStore.getDBInstance(MongoDBConnConfig.DATABASE_TEMP);
 		ds.getMongo().dropDatabase(MongoDBConnConfig.DATABASE_TEMP);
 		
-		int taskNum = getThreadNum();
+		int taskNum = getThreadNum(hour);
 		final CountDownLatch count = new CountDownLatch(taskNum);
 		//提交taskNum个日志分析任务
-		logger.error("{}个日志分析任务将运行：{}。",taskNum,new Date().getTime());
-		if(existNewLogs(Constant.PATH_REQUEST))
+		logger.info("{}，{}个日志分析任务将运行。",hour,taskNum);
+		if(existNewLogs(Constant.PATH_REQUEST,hour))
 		{
-			executor.submit(new LogFileParser<ClientMessage>(ClientMessage.class,logpath + Constant.PATH_REQUEST + "/" + TimeUtil.getDayLastHour(new Date()) + ".log",count));
+			executor.submit(new LogFileParser<ClientMessage>(ClientMessage.class,getLogPath(Constant.PATH_REQUEST, hour),count));
 		}
 		
-		if(existNewLogs(Constant.PATH_PUSH))
+		if(existNewLogs(Constant.PATH_PUSH,hour))
 		{
-			executor.submit(new LogFileParser<AdFeedback>(AdFeedback.class,logpath + Constant.PATH_PUSH + "/" + TimeUtil.getDayLastHour(new Date()) + ".log",count));
+			executor.submit(new LogFileParser<AdFeedback>(AdFeedback.class,getLogPath(Constant.PATH_PUSH, hour),count));
 		}
 		
-		if(existNewLogs(Constant.PATH_VIEW))
+		if(existNewLogs(Constant.PATH_VIEW,hour))
 		{
-			executor.submit(new LogFileParser<AdFeedback>(AdFeedback.class,logpath + Constant.PATH_VIEW + "/" + TimeUtil.getDayLastHour(new Date()) + ".log",count));
+			executor.submit(new LogFileParser<AdFeedback>(AdFeedback.class,getLogPath(Constant.PATH_VIEW, hour),count));
 		}
 		
-		if(existNewLogs(Constant.PATH_CLICK))
+		if(existNewLogs(Constant.PATH_CLICK,hour))
 		{
-			executor.submit(new LogFileParser<AdFeedback>(AdFeedback.class,logpath + Constant.PATH_CLICK + "/" + TimeUtil.getDayLastHour(new Date()) + ".log",count));
+			executor.submit(new LogFileParser<AdFeedback>(AdFeedback.class,getLogPath(Constant.PATH_CLICK, hour),count));
 		}
 		
-		if(existNewLogs(Constant.PATH_DOWNLOAD))
+		if(existNewLogs(Constant.PATH_DOWNLOAD,hour))
 		{
-			executor.submit(new LogFileParser<SoftFeedback>(SoftFeedback.class,logpath + Constant.PATH_DOWNLOAD + "/" + TimeUtil.getDayLastHour(new Date()) + ".log",count));
+			executor.submit(new LogFileParser<SoftFeedback>(SoftFeedback.class,getLogPath(Constant.PATH_DOWNLOAD, hour),count));
 		}
 		
-		if(existNewLogs(Constant.PATH_INSTALL))
+		if(existNewLogs(Constant.PATH_INSTALL,hour))
 		{
-			executor.submit(new LogFileParser<SoftFeedback>(SoftFeedback.class,logpath + Constant.PATH_INSTALL + "/" + TimeUtil.getDayLastHour(new Date()) + ".log",count));
+			executor.submit(new LogFileParser<SoftFeedback>(SoftFeedback.class,getLogPath(Constant.PATH_INSTALL, hour),count));
 		}
 		return count;
 	}

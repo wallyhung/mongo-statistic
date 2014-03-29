@@ -2,20 +2,16 @@ package com.jukuad.statistic.config;
 
 import java.net.UnknownHostException;
 
-
-
-
 import org.mongodb.morphia.Datastore;
-
-
 import org.mongodb.morphia.Morphia;
 
 import com.mongodb.MongoClient;
 import com.mongodb.MongoException;
+import com.mongodb.ServerAddress;
 
 /**
  * MongoDB联合Morphia框架生成DataStore的类
- * @author chaijunkun
+ * @author wally
  *
  */
 public class MongoDBDataStore 
@@ -27,8 +23,9 @@ public class MongoDBDataStore
 	public static Datastore getDBInstance(String database)
 	{
 		MongoClient connection = null;
-		try {
-			connection = new MongoClient(MongoDBConnConfig.SERVER, MongoDBConnConfig.PORT);
+		try 
+		{
+			connection = new MongoClient(new ServerAddress(MongoDBConnConfig.SERVER, MongoDBConnConfig.PORT));
 		} catch (UnknownHostException e) {
 			return null;
 		} catch (MongoException e) {

@@ -53,7 +53,20 @@ public class TimeUtil {
 	}
 	
 	/**
-	 * 获取某一天的时间字符串
+	 * 获取某一刻的具体时间
+	 * @param date
+	 * @return
+	 */
+	public static String getDayTime(Date date)
+	{
+		SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+		String str = format.format(date);
+		return str;
+	}
+	
+	
+	/**
+	 * 获取某一天小时的时间字符串
 	 * @param date
 	 * @return
 	 */
@@ -64,6 +77,11 @@ public class TimeUtil {
 		return str;
 	}
 	
+	/**
+	 * 获取上一个小时的字符串时间
+	 * @param date
+	 * @return
+	 */
 	public static String getDayLastHour(Date date)
 	{
 		Calendar calendar = Calendar.getInstance();
@@ -74,6 +92,58 @@ public class TimeUtil {
 		String str = format.format(calendar.getTime());
 		return str;
 	}
+	
+	/**
+	 * 获取上一个小时开始时间的时间戳
+	 * @param date
+	 * @return
+	 */
+	public static long getDayLastHourTimestamp(Date date)
+	{
+		return getDayLastHourDate(date).getTime();
+	}
+	
+	/**
+	 * 获取上一个小时开始时间的日期时间
+	 * @param date
+	 * @return
+	 */
+	public static Date getDayLastHourDate(Date date)
+	{
+		Calendar calendar = Calendar.getInstance();
+		calendar.setTimeInMillis(date.getTime());
+		calendar.add(Calendar.HOUR_OF_DAY, -1);
+		
+		SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH");
+		String str = format.format(calendar.getTime());
+		try 
+		{
+			date = format.parse(str);
+		} catch (ParseException e) {
+			e.printStackTrace();
+		}
+		return date;
+	}
+	
+	
+	/**
+	 * 转换小时字符串为Date
+	 * @param hour
+	 * @return
+	 */
+	public static Date getDayFromHourString(String hour)
+	{
+		SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd-HH");
+		Date date = null;
+		try 
+		{
+			date = format.parse(hour);
+		} catch (ParseException e) {
+			e.printStackTrace();
+		}
+		return date;
+	}
+	
 	
 	
 	
@@ -132,6 +202,12 @@ public class TimeUtil {
 	 */
 	public static Date getLastDayEnd(Date date)
 	{
+		return getDayEnd(getLastDay(date));
+	}
+	
+	
+	public static Date getLastDay(Date date)
+	{
 		Calendar calendar = Calendar.getInstance();
 		calendar.setTimeInMillis(date.getTime());
 		calendar.add(Calendar.DATE, -1);    //得到前一天
@@ -148,19 +224,61 @@ public class TimeUtil {
 		return new Date(System.currentTimeMillis());
 	}
 	
+	/**
+	 * 获取两个时间相差的中间小时字符串
+	 * @param time
+	 * @param current
+	 * @return
+	 */
+	public static String[] getDistanceTimeHourArray(Date time,Date current)
+	{
+	     String timeHour = getDayHour(time);
+	     String curHour = getDayHour(current);
+	     int thour = Integer.parseInt(timeHour.substring(timeHour.length()-2,timeHour.length()));
+	     int chour = Integer.parseInt(curHour.substring(timeHour.length()-2,curHour.length()));
+//	     int size = chour - (thour + 1) ;
+	     String[] str = new String[24];
+	     int index = 0;
+	     for (int i = thour; i < chour + 1; i++) {
+	    	 String s = timeHour.substring(0, timeHour.length()-2) + getTwoHourNumber(i);
+	    	 str[index] = s;
+	    	 index++;
+		 }
+		return str;
+	}
+	
+	private static String getTwoHourNumber(int i)
+	{
+		String res = Integer.valueOf(i).toString();
+		if(res.length() == 1) res = "0" + res; 
+		return res;
+	}
 	
 	
 	public static void main(String[] args) {
 		
-		Date date = StrToDate("2014-03-05 12:12:12");
-		System.out.println(getDayStart(date));
-		System.out.println(getDayEnd(date));
-		System.out.println(getSevenDaysBefore(date));
-		System.out.println(getLastDayEnd(date));
-	    System.out.println(getDayLastHour(StrToDate("2013-01-03 1:30:12")));
+		System.out.println(getDayStart(new Date()));
+		System.out.println(getDayEnd(new Date()));
+		
+		System.out.println("--------------");
+		System.out.println(getLastDay(new Date()));
+		System.out.println(getLastDayEnd(new Date()));
+		System.out.println("--------------");
+		
+		
+	    System.out.println(getDayLastHour(new Date()));
+	    System.out.println(getDayLastHourDate(new Date()));
+	    System.out.println(getDayLastHourTimestamp(new Date()));
+	    System.out.println("--------------");
 	    
 	    System.out.println(StrToDate("2014-03-04 00:00:00").getTime()-StrToDate("2014-03-01 00:00:00").getTime());
-	    System.out.println();
+	    String[] ss = getDistanceTimeHourArray(StrToDate("2014-03-22 07:30:00"), new Date());
+	    for (String string : ss) {
+			System.out.println(string);
+		}
+	    
+	    
+	    System.out.println(getDayFromHourString("2014-03-28-10"));
 	}
 	
    

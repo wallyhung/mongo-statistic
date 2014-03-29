@@ -1,18 +1,68 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <configuration>
-  <appender name="stdout" class="ch.qos.logback.core.ConsoleAppender">
-      <encoder charset="UTF-8">
-          <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
-      </encoder>
-  </appender>  
+	<substitutionProperty name="log.base" value="d:\\logs\\adstatistic\\adstatistic" />
+	<appender name="stdout" class="ch.qos.logback.core.ConsoleAppender">
+		 <encoder charset="UTF-8">
+            <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
+         </encoder>
+	</appender>
+	<!-- 
+	<appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+	    <filter class="ch.qos.logback.classic.filter.LevelFilter">
+	      <level>INFO</level>
+	      <onMatch>ACCEPT</onMatch>
+	      <onMismatch>DENY</onMismatch>
+	    </filter>
+	    <encoder>
+	      <pattern>
+	        %-4relative [%thread] %-5level %logger{30} - %msg%n
+	      </pattern>
+	    </encoder>
+    </appender> -->
+	
+   <!--  
+    <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+	    <filter class="ch.qos.logback.core.filter.EvaluatorFilter">      
+	      <evaluator class="ch.qos.logback.classic.boolex.GEventEvaluator"> 
+	        <expression>
+	           e.level.toInt() >= WARN.toInt() &amp;&amp;  Stands for && in XML
+	           !(e.mdc?.get("req.userAgent") =~ /Googlebot|msnbot|Yahoo/ )
+	        </expression>
+	      </evaluator>
+	      <OnMismatch>DENY</OnMismatch>
+	      <OnMatch>NEUTRAL</OnMatch>
+	    </filter>
+	    <encoder>
+	      <pattern>
+	        %-4relative [%thread] %-5level %logger - %msg%n
+	      </pattern>
+	    </encoder>
+   </appender> -->
   
-  <property name="LOG_HOME" value="d:/logs" /> 
-  <!-- 按照每天生成日志文件 -->   
-    <appender name="file"  class="ch.qos.logback.core.rolling.RollingFileAppender">   
+	<!-- <appender name="file-config"
+		class="ch.qos.logback.core.rolling.RollingFileAppender">
+		<filter class="ch.qos.logback.core.filter.EvaluatorFilter">
+			<evaluator name="eva_config">
+				<expression>return message.contains("config");</expression>
+			</evaluator>
+			<onMatch>NEUTRAL</onMatch>
+			<onMismatch>DENY</onMismatch>
+		</filter>
+ 
+		<Encoding>UTF-8</Encoding>
+		<rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <FileNamePattern>${log.base}_config_%d{yyyy-MM-dd}.log</FileNamePattern>   
+            <MaxHistory>30</MaxHistory>
+        </rollingPolicy>   
+		<layout class="ch.qos.logback.classic.PatternLayout">
+			<pattern>%date [%thread] %-5level %logger{80} - %msg%n</pattern>
+		</layout>
+	</appender> -->
+	
+	<appender name="file—all"  class="ch.qos.logback.core.rolling.RollingFileAppender">   
         <Encoding>UTF-8</Encoding>   
         <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-            <!--日志文件输出的文件名-->
-            <FileNamePattern>${LOG_HOME}/adreport-%d{yyyy-MM-dd}.log</FileNamePattern>   
+            <FileNamePattern>${log.base}_all_%d{yyyy-MM-dd}.log</FileNamePattern>   
             <MaxHistory>30</MaxHistory>
         </rollingPolicy>   
         <layout class="ch.qos.logback.classic.PatternLayout">  
@@ -22,13 +72,16 @@
        </layout> 
         <!--日志文件最大的大小-->
        <triggeringPolicy class="ch.qos.logback.core.rolling.SizeBasedTriggeringPolicy">
-         <MaxFileSize>10MB</MaxFileSize>
+         <MaxFileSize>5MB</MaxFileSize>
        </triggeringPolicy>
     </appender> 
     
-  <root level="error">
-    <appender-ref ref="stdout" /> 
-    <appender-ref ref="file" />
-  </root>
-  
+	<root  level="DEBUG">
+		<appender-ref ref="stdout" />
+		<appender-ref ref="file—all" />
+	</root>
 </configuration>
+
+
+
+

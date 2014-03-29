@@ -19,5 +19,13 @@ public interface PushService
 	 * @param sum
 	 */
 	void writeDaySumToMysql(DaySum sum);
-
+	
+	
+	/**
+	 * 一次解析三条数据
+	 * @param applist
+	 * @param adlist
+	 * @param sum
+	 */
+	void writeDayDataToMysql(List<AppDayStatistic> applist,List<AdDayStatistic> adlist,DaySum sum);
 }

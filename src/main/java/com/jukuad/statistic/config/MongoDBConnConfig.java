@@ -11,9 +11,11 @@ public class MongoDBConnConfig
 {
 	private final static Logger logger = LoggerFactory.getLogger(MongoDBConnConfig.class);
 	//MongoDB主机名称或IP
-    public static String SERVER =              "localhost";
+    public static String SERVER =              "127.0.0.1";
     //MongoDB端口
-    public static int PORT =                   27017;
+    public static int PORT =                    27017;
+    public static String USER =                 "root";
+    public static String PASS =                 "root";
     
     /***数据库实例名称**/
 	public  static String DATABASE_TEMP =      "temp";
@@ -39,7 +41,6 @@ public class MongoDBConnConfig
 				                 "data" : properties.getProperty("data");
 			DATABASE_STATISTIC = properties.getProperty("statistic") == null || "".equals(properties.getProperty("statistic") == null) ? 
 				                 "statistic" : properties.getProperty("statistic");
-			
 		}catch(Exception e)
 		{
 			logger.error("mongodb config error:{}",e.getMessage());
@@ -55,5 +56,4 @@ public class MongoDBConnConfig
 		}
 	}
 	
-
 }
