@@ -2,8 +2,10 @@ package com.jukuad.statistic.util;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
 
 
 public class TimeUtil {
@@ -125,6 +127,20 @@ public class TimeUtil {
 		return date;
 	}
 	
+	/**
+	 * 获取下一个小时开始时间的日期时间
+	 * @param date
+	 * @return
+	 */
+	public static Date getDayNextHourDate(String hour)
+	{
+		Date date = getDayFromHourString(hour);
+		Calendar calendar = Calendar.getInstance();
+		calendar.setTimeInMillis(date.getTime());
+		calendar.add(Calendar.HOUR_OF_DAY, 1);
+		return calendar.getTime();
+	}
+	
 	
 	/**
 	 * 转换小时字符串为Date
@@ -176,7 +192,7 @@ public class TimeUtil {
 		Calendar calendar = Calendar.getInstance();
 		calendar.setTimeInMillis(date.getTime());
 //		calendar.set(Calendar.DAY_OF_MONTH,calendar.get(Calendar.DAY_OF_MONTH)-7);
-		calendar.add(Calendar.DATE, -7);    //得到前一天
+		calendar.add(Calendar.DATE, -7);    
 		return calendar.getTime();
 	}
 	
@@ -191,6 +207,19 @@ public class TimeUtil {
 		Calendar calendar = Calendar.getInstance();
 		calendar.setTimeInMillis(date.getTime());
 		calendar.set(Calendar.DAY_OF_MONTH,calendar.get(Calendar.DAY_OF_MONTH)-8);
+		return calendar.getTime();
+	}
+	
+	/**
+	 * 获取一个月前的时间
+	 * @param date
+	 * @return
+	 */
+	public static Date getOneMonthBefore(Date date)
+	{
+		Calendar calendar = Calendar.getInstance();
+		calendar.setTimeInMillis(date.getTime());
+		calendar.set(Calendar.DAY_OF_MONTH,calendar.get(Calendar.DAY_OF_MONTH)-30);
 		return calendar.getTime();
 	}
 	
@@ -247,6 +276,48 @@ public class TimeUtil {
 		return str;
 	}
 	
+	/**
+	 * 获取两个小时字符串相差的小时数组
+	 * @param hour        当前小时
+	 * @param dataHour    数据库数据的小时记录
+	 * @return
+	 */
+	public static List<String> getDistanceTimeHourArray(String hour,String dataHour)
+	{
+		List<String> res = new ArrayList<String>();
+		String[] s1 = hour.split("-");
+		String[] s2 = dataHour.split("-");
+		int day1 = Integer.parseInt(s1[2]);
+		int day2 = Integer.parseInt(s2[2]);
+		int hour1 = Integer.parseInt(s1[3]);
+		int hour2 = Integer.parseInt(s2[3]);
+		if(day1 == day2)
+		{
+			for (int i = hour2 + 1; i < hour1 + 1; i++) {
+				String s = hour.substring(0, hour.length()-2) + getTwoHourNumber(i);
+				res.add(s);
+			}
+		}
+		else
+		{
+			for(int day = day2; day < day1 + 1;day++)
+			{
+				String dayFormat = hour.substring(0, hour.length()-5) + getTwoHourNumber(day) + "-";
+				int start = 0;
+				int end = 24;
+				if(day == day2) start = hour2 + 1;
+				if(day == day1) end = hour1 + 1;
+				for (int i = start; i < end; i++) 
+				{
+					String s = dayFormat + getTwoHourNumber(i);
+					res.add(s);
+				}
+			}
+		}
+		return res;
+	}
+	
+	
 	private static String getTwoHourNumber(int i)
 	{
 		String res = Integer.valueOf(i).toString();
@@ -257,29 +328,24 @@ public class TimeUtil {
 	
 	public static void main(String[] args) {
 		
-		System.out.println(getDayStart(new Date()));
-		System.out.println(getDayEnd(new Date()));
-		
-		System.out.println("--------------");
-		System.out.println(getLastDay(new Date()));
-		System.out.println(getLastDayEnd(new Date()));
-		System.out.println("--------------");
-		
-		
-	    System.out.println(getDayLastHour(new Date()));
-	    System.out.println(getDayLastHourDate(new Date()));
-	    System.out.println(getDayLastHourTimestamp(new Date()));
-	    System.out.println("--------------");
+		System.out.println(StrToDate("2014-04-17 00:00:00").getTime());
+		System.out.println(StrToDate("2014-04-17 23:59:59").getTime());
+//		System.out.println(getSevenDaysBefore(StrToDate("2014-04-01 23:59:59")));
+//		System.out.println(getEightDaysBefore(StrToDate("2014-04-01 23:59:59")));
+//		System.out.println(getOneMonthBefore(StrToDate("2014-04-01 23:59:59")));
 	    
-	    System.out.println(StrToDate("2014-03-04 00:00:00").getTime()-StrToDate("2014-03-01 00:00:00").getTime());
-	    String[] ss = getDistanceTimeHourArray(StrToDate("2014-03-22 07:30:00"), new Date());
-	    for (String string : ss) {
+//	    System.out.println(getDayStart(new Date()).getTime());
+//	    System.out.println(getDayEnd(new Date()).getTime());
+//	    System.out.println(getLastDay(new Date()).getTime());
+		
+//		System.out.println(getDayFromHourString("2014-03-31-06"));
+//		System.out.println(getDayNextHourDate("2014-03-31-06"));
+		
+		String hour1 = "2014-04-13-02";
+		String hour2 = "2014-04-13-03";
+		List<String> ss = getDistanceTimeHourArray(hour2, hour1);
+		for (String string : ss) {
 			System.out.println(string);
 		}
-	    
-	    
-	    System.out.println(getDayFromHourString("2014-03-28-10"));
 	}
-	
-   
 }

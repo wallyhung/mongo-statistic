@@ -4,7 +4,9 @@ package com.jukuad.statistic.pojo;
 import org.bson.types.ObjectId;
 import org.mongodb.morphia.annotations.Entity;
 import org.mongodb.morphia.annotations.Id;
+import org.mongodb.morphia.annotations.Indexed;
 import org.mongodb.morphia.annotations.Property;
+import org.mongodb.morphia.utils.IndexDirection;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
@@ -31,6 +33,7 @@ public class AdDayStatistic extends BaseEntity
     private long                alive; //终端数
     private String              adid;
     @Property(value="day")
+    @Indexed(value=IndexDirection.DESC, name="idx_day", unique=false, dropDups=false)
     private String                day;
 
     ///~ getter and setter

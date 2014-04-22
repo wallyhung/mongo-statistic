@@ -28,13 +28,18 @@ dependencies
             'org.mongodb.morphia:morphia:0.107',
             'mysql:mysql-connector-java:5.1.29',
             'commons-dbcp:commons-dbcp:1.4',
-            'com.fasterxml.jackson.core:jackson-core:2.3.0',
-            'com.fasterxml.jackson.core:jackson-databind:2.3.0',
+            'com.fasterxml.jackson.core:jackson-core:2.3.2',
+            'com.fasterxml.jackson.core:jackson-databind:2.3.2',
             'org.slf4j:slf4j-api:1.7.6',
             'org.mongodb.morphia:morphia-logging-slf4j:0.107',
             'ch.qos.logback:logback-core:1.1.1',
             'ch.qos.logback:logback-classic:1.1.1',
             'quartz:quartz:1.5.2')
+    //spring
+    compile 'org.springframework:spring-core:4.0.3.RELEASE'
+    compile 'org.springframework:spring-context:4.0.3.RELEASE'
+            
+            
     compile files('lib/ne81commons-1.0.jar')
     testCompile('junit:junit:4.11')
 }

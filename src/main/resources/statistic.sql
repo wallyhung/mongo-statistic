@@ -1,6 +1,6 @@
 /*
 SQLyog Ultimate v11.11 (64 bit)
-MySQL - 5.5.35-MariaDB : Database - statistic
+MySQL - 5.5.36-MariaDB : Database - statistic
 *********************************************************************
 */
 
@@ -26,19 +26,37 @@ CREATE TABLE `ad_day_report` (
   `push` bigint(20) DEFAULT '0' COMMENT '推送数',
   `view` bigint(20) DEFAULT '0' COMMENT '展示数',
   `click` bigint(20) DEFAULT '0' COMMENT '点击数',
-  `download` bigint(20) DEFAULT '0' COMMENT '下载数',
-  `install` bigint(20) DEFAULT '0' COMMENT '安装数',
+  `d_wall` bigint(20) DEFAULT '0' COMMENT '积分墙下载数',
+  `d_oth` bigint(20) DEFAULT '0' COMMENT '非墙下载数',
+  `i_wall` bigint(20) DEFAULT '0' COMMENT '积分墙安装数',
+  `i_oth` bigint(20) DEFAULT '0' COMMENT '非墙安装数',
+  `remain` bigint(20) DEFAULT '0' COMMENT '终端数',
   `day` varchar(12) DEFAULT NULL COMMENT '统计时间',
   PRIMARY KEY (`oid`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 /*Data for the table `ad_day_report` */
 
-LOCK TABLES `ad_day_report` WRITE;
+/*Table structure for table `ad_hour_report` */
 
+DROP TABLE IF EXISTS `ad_hour_report`;
 
+CREATE TABLE `ad_hour_report` (
+  `oid` varchar(50) NOT NULL COMMENT '对应mongo库的objectid',
+  `adid` varchar(32) NOT NULL COMMENT '广告ID',
+  `push` bigint(20) DEFAULT '0' COMMENT '推送数',
+  `view` bigint(20) DEFAULT '0' COMMENT '展示数',
+  `click` bigint(20) DEFAULT '0' COMMENT '点击数',
+  `d_wall` bigint(20) DEFAULT '0' COMMENT '积分墙下载数',
+  `d_oth` bigint(20) DEFAULT '0' COMMENT '非墙下载数',
+  `i_wall` bigint(20) DEFAULT '0' COMMENT '积分墙安装数',
+  `i_oth` bigint(20) DEFAULT '0' COMMENT '非墙安装数',
+  `remain` bigint(20) DEFAULT '0' COMMENT '终端数',
+  `hour` varchar(20) DEFAULT NULL COMMENT '统计时间',
+  PRIMARY KEY (`oid`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
-UNLOCK TABLES;
+/*Data for the table `ad_hour_report` */
 
 /*Table structure for table `app_day_report` */
 
@@ -48,6 +66,37 @@ CREATE TABLE `app_day_report` (
   `oid` varchar(50) NOT NULL COMMENT '对应mongo库的objectid',
   `fid` varchar(32) NOT NULL COMMENT '发布ID',
   `request` bigint(20) DEFAULT '0' COMMENT '请求数',
+  `push` bigint(20) DEFAULT NULL COMMENT '推送数',
+  `view` bigint(20) DEFAULT '0' COMMENT '展示数',
+  `cpc` bigint(20) DEFAULT '0' COMMENT 'cpc点击数',
+  `c_wall` bigint(20) DEFAULT '0' COMMENT '积分墙推荐点击数',
+  `c_oth` bigint(20) DEFAULT '0' COMMENT '非墙点击数',
+  `d_wall` bigint(20) DEFAULT '0' COMMENT '积分墙下载数',
+  `d_oth` bigint(20) DEFAULT '0' COMMENT '非墙下载数',
+  `i_wall` bigint(20) DEFAULT '0' COMMENT '积分墙安装数',
+  `i_oth` bigint(20) DEFAULT '0' COMMENT '非墙安装数',
+  `new_u` bigint(20) DEFAULT '0' COMMENT '新增用户',
+  `remain` bigint(20) DEFAULT '0' COMMENT '留存用户',
+  `seven` bigint(20) DEFAULT '0' COMMENT '七日留存',
+  `alive` bigint(20) DEFAULT '0' COMMENT '日活用户',
+  `first` bigint(20) NOT NULL COMMENT '第一次请求时间',
+  `day` varchar(12) DEFAULT NULL COMMENT '统计时间',
+  `c_sum` bigint(20) DEFAULT '0' COMMENT 'web cpc合计',
+  `i_sum` bigint(20) DEFAULT '0' COMMENT 'web install 合计',
+  PRIMARY KEY (`oid`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+/*Data for the table `app_day_report` */
+
+/*Table structure for table `app_hour_report` */
+
+DROP TABLE IF EXISTS `app_hour_report`;
+
+CREATE TABLE `app_hour_report` (
+  `oid` varchar(50) NOT NULL COMMENT '对应mongo库的objectid',
+  `fid` varchar(32) NOT NULL COMMENT '发布ID',
+  `request` bigint(20) DEFAULT '0' COMMENT '请求数',
+  `push` bigint(20) DEFAULT '0' COMMENT '推送数',
   `view` bigint(20) DEFAULT '0' COMMENT '展示数',
   `cpc` bigint(20) DEFAULT '0' COMMENT 'cpc点击数',
   `c_wall` bigint(20) DEFAULT '0' COMMENT '积分墙推荐点击数',
@@ -60,17 +109,11 @@ CREATE TABLE `app_day_report` (
   `remain` bigint(20) DEFAULT '0' COMMENT '留存用户',
   `alive` bigint(20) DEFAULT '0' COMMENT '日活用户',
   `first` bigint(20) NOT NULL COMMENT '第一次请求时间',
-  `day` varchar(12) DEFAULT NULL COMMENT '统计时间',
+  `hour` varchar(20) DEFAULT NULL COMMENT '统计时间',
   PRIMARY KEY (`oid`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
-/*Data for the table `app_day_report` */
-
-LOCK TABLES `app_day_report` WRITE;
-
-
-
-UNLOCK TABLES;
+/*Data for the table `app_hour_report` */
 
 /*Table structure for table `day_sum` */
 
@@ -89,10 +132,20 @@ CREATE TABLE `day_sum` (
 
 /*Data for the table `day_sum` */
 
-LOCK TABLES `day_sum` WRITE;
+/*Table structure for table `device_day_report` */
 
+DROP TABLE IF EXISTS `device_day_report`;
 
-UNLOCK TABLES;
+CREATE TABLE `device_day_report` (
+  `oid` varchar(30) NOT NULL COMMENT 'mongo对应的id',
+  `type` int(2) DEFAULT NULL COMMENT '统计类型：1.终端用户2.品牌3.型号4.系统5.地域6.联网方式',
+  `field` varchar(20) DEFAULT NULL COMMENT '统计字段',
+  `count` bigint(20) DEFAULT '0' COMMENT '统计字段对应的值',
+  `day` varchar(10) DEFAULT NULL COMMENT '统计日期',
+  PRIMARY KEY (`oid`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+/*Data for the table `device_day_report` */
 
 /*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
 /*!40014 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS */;

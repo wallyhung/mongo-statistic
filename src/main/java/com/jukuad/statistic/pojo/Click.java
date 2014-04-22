@@ -9,7 +9,6 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 @Entity(value="click", noClassnameStored = true)
 public class Click extends BaseEntity
 {
-
 	    //morphia中的注解 标明该key为标识字段(MongoDB中特殊的ObjectId字段)
 		@Id
 		//Jackson中的注解 标明在序列化与反序列化过程中不使用该key

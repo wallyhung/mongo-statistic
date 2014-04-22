@@ -3,10 +3,13 @@ package com.jukuad.statistic.pojo;
 import org.bson.types.ObjectId;
 import org.mongodb.morphia.annotations.Entity;
 import org.mongodb.morphia.annotations.Id;
+import org.mongodb.morphia.annotations.Index;
+import org.mongodb.morphia.annotations.Indexes;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 @Entity(value="push", noClassnameStored = true)
+@Indexes(@Index(name="idx_ad_distinct_imei", value="adid,imei,-time"))
 public class Push extends BaseEntity
 {
 

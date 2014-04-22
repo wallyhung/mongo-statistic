@@ -5,6 +5,8 @@ import org.bson.types.ObjectId;
 import org.mongodb.morphia.annotations.Embedded;
 import org.mongodb.morphia.annotations.Entity;
 import org.mongodb.morphia.annotations.Id;
+import org.mongodb.morphia.annotations.Index;
+import org.mongodb.morphia.annotations.Indexes;
 import org.mongodb.morphia.annotations.Property;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -15,6 +17,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
  *
  */
 @Entity(value="app_day", noClassnameStored = true)
+@Indexes(@Index(name="idx_day_app_report", value="fid,-day"))
 public class AppDayStatistic extends BaseEntity
 {
 	 //morphia中的注解 标明该key为标识字段(MongoDB中特殊的ObjectId字段)
@@ -25,7 +28,6 @@ public class AppDayStatistic extends BaseEntity
 	
 	/**发布ID(在网站应用提交过程中产生的发布ID)**/
     private String              fid;
-
     private long                request;
     private long                push;
     private long                view;
@@ -37,9 +39,15 @@ public class AppDayStatistic extends BaseEntity
     private Attach              install;
     private long                new_u;
     private long                remain;
+    private long                seven;
     private long                alive;
+    
     @Property(value="day")
     private String                day;
+    
+    ///~ web data sum
+    private long               c_sum;
+    private long               i_sum;
 
     ///~ getter and setter
 	public ObjectId getId() {
@@ -140,7 +148,28 @@ public class AppDayStatistic extends BaseEntity
 		this.day = day;
 	}
 
-	
-	
+	public long getC_sum() {
+		return c_sum;
+	}
+
+	public void setC_sum(long c_sum) {
+		this.c_sum = c_sum;
+	}
+
+	public long getI_sum() {
+		return i_sum;
+	}
+
+	public void setI_sum(long i_sum) {
+		this.i_sum = i_sum;
+	}
+
+	public long getSeven() {
+		return seven;
+	}
+
+	public void setSeven(long seven) {
+		this.seven = seven;
+	}
 
 }

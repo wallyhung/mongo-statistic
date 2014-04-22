@@ -3,11 +3,13 @@ package com.jukuad.statistic.pojo;
 import org.bson.types.ObjectId;
 import org.mongodb.morphia.annotations.Entity;
 import org.mongodb.morphia.annotations.Id;
-
+import org.mongodb.morphia.annotations.Index;
+import org.mongodb.morphia.annotations.Indexes;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 //morphia中的注解 标明该对象存入request集合中 并且不存储类名  
 @Entity(value="request", noClassnameStored = true)  
+@Indexes(@Index(name="idx_distinct_imei", value="fid,imei,-time"))
 public class Request extends BaseEntity
 {
 	    //morphia中的注解 标明该key为标识字段(MongoDB中特殊的ObjectId字段)
@@ -22,13 +24,6 @@ public class Request extends BaseEntity
 	    private String              imei;
 	    /** 应用名称**/
 	    private String              name;
-	    /** 地理位置 **/
-	    private String              loc;
-	    /** 平台(android、ios) **/
-	    private String              plat;
-	    /** 渠道ID **/
-	    private int                 cid;
-
 		
 		///~ getter and setter
 		public ObjectId getId() {
@@ -62,30 +57,4 @@ public class Request extends BaseEntity
 		public void setName(String name) {
 			this.name = name;
 		}
-
-		public String getLoc() {
-			return loc;
-		}
-
-		public void setLoc(String loc) {
-			this.loc = loc;
-		}
-
-		public String getPlat() {
-			return plat;
-		}
-
-		public void setPlat(String plat) {
-			this.plat = plat;
-		}
-
-		public int getCid() {
-			return cid;
-		}
-
-		public void setCid(int cid) {
-			this.cid = cid;
-		}
-
-		
 }

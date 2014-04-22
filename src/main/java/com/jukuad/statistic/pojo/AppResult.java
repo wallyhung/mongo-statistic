@@ -5,6 +5,8 @@ import org.bson.types.ObjectId;
 import org.mongodb.morphia.annotations.Embedded;
 import org.mongodb.morphia.annotations.Entity;
 import org.mongodb.morphia.annotations.Id;
+import org.mongodb.morphia.annotations.Index;
+import org.mongodb.morphia.annotations.Indexes;
 import org.mongodb.morphia.annotations.Property;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -17,6 +19,8 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
  *
  */
 @Entity(value="app_res", noClassnameStored = true)
+@Indexes({@Index(name="idx_day_app_report", value="fid,-time"),
+	      @Index(name="idx_hour_app_report", value="fid,-hour")})
 public class AppResult extends BaseEntity
 {
 	 //morphia中的注解 标明该key为标识字段(MongoDB中特殊的ObjectId字段)
@@ -43,6 +47,10 @@ public class AppResult extends BaseEntity
     @JsonDeserialize(using= DateDeserializer.class)
     @Property(value="first")
     private long                first;
+    
+    private long                remain;
+    
+    private long                new_u;
     
     private String hour;
     
@@ -129,6 +137,23 @@ public class AppResult extends BaseEntity
 	public void setHour(String hour) {
 		this.hour = hour;
 	}
+
+	public long getRemain() {
+		return remain;
+	}
+
+	public void setRemain(long remain) {
+		this.remain = remain;
+	}
+
+	public long getNew_u() {
+		return new_u;
+	}
+
+	public void setNew_u(long new_u) {
+		this.new_u = new_u;
+	}
+	
 	
 
 }

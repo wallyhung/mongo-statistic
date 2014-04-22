@@ -4,6 +4,8 @@ package com.jukuad.statistic.pojo;
 import org.bson.types.ObjectId;
 import org.mongodb.morphia.annotations.Entity;
 import org.mongodb.morphia.annotations.Id;
+import org.mongodb.morphia.annotations.Index;
+import org.mongodb.morphia.annotations.Indexes;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
@@ -13,6 +15,8 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
  *
  */
 @Entity(value="ad_res", noClassnameStored = true)
+@Indexes({@Index(name="idx_day_ad_report", value="adid,-time"),
+          @Index(name="idx_hour_ad_report", value="adid,-hour")})
 public class AdResult extends BaseEntity
 {
 	 //morphia中的注解 标明该key为标识字段(MongoDB中特殊的ObjectId字段)
@@ -28,6 +32,7 @@ public class AdResult extends BaseEntity
     private long                install;
     private String              adid;
     
+    private long                remain;
     
     private String hour;
     
@@ -103,6 +108,14 @@ public class AdResult extends BaseEntity
 
 	public void setHour(String hour) {
 		this.hour = hour;
+	}
+
+	public long getRemain() {
+		return remain;
+	}
+
+	public void setRemain(long remain) {
+		this.remain = remain;
 	}
 	
 	

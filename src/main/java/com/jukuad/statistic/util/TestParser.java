@@ -27,6 +27,8 @@ public class TestParser<T> {
 		
 		//创建Jackson全局的objectMapper 它既可以用于序列化 也可以用于反序列化
 		ObjectMapper objectMapper = new ObjectMapper();
+		objectMapper.configure(JsonParser.Feature.ALLOW_UNQUOTED_CONTROL_CHARS, true);
+	    objectMapper.configure(JsonParser.Feature.ALLOW_SINGLE_QUOTES, true);
 		//得到JSON处理的工厂对象
 		JsonFactory jsonFactory= objectMapper.getFactory();
 		
