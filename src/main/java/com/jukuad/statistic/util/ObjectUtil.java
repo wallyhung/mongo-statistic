@@ -14,6 +14,7 @@ import com.jukuad.statistic.pojo.Info;
 import com.jukuad.statistic.pojo.Install;
 import com.jukuad.statistic.pojo.Push;
 import com.jukuad.statistic.pojo.Request;
+import com.jukuad.statistic.pojo.RequestTemp;
 import com.jukuad.statistic.pojo.View;
 /**
  * 采集日志信息转为数据库对象
@@ -27,12 +28,12 @@ public class ObjectUtil {
 	 * @param mess
 	 * @return
 	 */
-	public static Request clientMessToRequest(ClientMessage mess)
+	public static RequestTemp clientMessToRequest(ClientMessage mess)
 	{
 		if(mess == null) return null;
 		else
 		{
-			Request request = new Request();
+			RequestTemp request = new RequestTemp();
 			request.setFid(mess.getSlot_name());
 			request.setImei(mess.getImei());
 			request.setName(mess.getApp_name());
@@ -40,6 +41,8 @@ public class ObjectUtil {
 			return request;
 		}
 	}
+	
+	
 	
 	public static Imei clientMessToImei(ClientMessage mess)
 	{

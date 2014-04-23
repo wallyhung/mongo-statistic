@@ -6,12 +6,16 @@ public class Constant
 	public final static String DB_DATA = "data";
 	public final static String DB_STATISTIC = "statistic";
 	public final static String DB_TEMP = "temp";
+	
+	/**日志根路径**/
+	public final static String[] PATH = {"d:/bin/logs","e:/"};
+	
 	/**点击日志路径**/
 	public final static String PATH_CLICK = "click";
 	/**下载日志路径**/
 	public final static String PATH_DOWNLOAD = "download";
 	/**客户端信息采集日志路径**/
-	public final static String PATH_INFO = "exception";
+	public final static String PATH_INFO = "info";
 	/**安装日志路径**/
 	public final static String PATH_INSTALL = "install";
 	/**推送日志路径**/
