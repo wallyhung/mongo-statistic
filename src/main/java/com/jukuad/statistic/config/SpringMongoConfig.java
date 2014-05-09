@@ -3,7 +3,6 @@ package com.jukuad.statistic.config;
 import org.mongodb.morphia.Datastore;
 import org.mongodb.morphia.Morphia;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
 
 import com.jukuad.statistic.base.DatastoreFactoryBean;
 import com.jukuad.statistic.base.MongoClientOptionsBean;
@@ -12,7 +11,6 @@ import com.jukuad.statistic.base.MorphiaFactoryBean;
 import com.mongodb.Mongo;
 import com.mongodb.MongoClientOptions;
 
-@Configuration
 public class SpringMongoConfig 
 {
 	public @Bean MongoClientOptions mongoClientOptions()

@@ -38,7 +38,7 @@ dependencies
     //spring
     compile 'org.springframework:spring-core:4.0.3.RELEASE'
     compile 'org.springframework:spring-context:4.0.3.RELEASE'
-            
+    //compile 'org.springframework:spring-aop:4.0.3.RELEASE'
             
             
     compile files('lib/ne81commons-1.0.jar')
