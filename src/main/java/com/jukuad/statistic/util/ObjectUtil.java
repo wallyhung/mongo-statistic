@@ -13,7 +13,6 @@ import com.jukuad.statistic.pojo.Imei;
 import com.jukuad.statistic.pojo.Info;
 import com.jukuad.statistic.pojo.Install;
 import com.jukuad.statistic.pojo.Push;
-import com.jukuad.statistic.pojo.Request;
 import com.jukuad.statistic.pojo.RequestTemp;
 import com.jukuad.statistic.pojo.View;
 /**

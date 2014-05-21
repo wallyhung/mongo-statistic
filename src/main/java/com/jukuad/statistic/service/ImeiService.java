@@ -6,6 +6,6 @@ import com.jukuad.statistic.pojo.Imei;
 
 public interface ImeiService extends BaseService<Imei, ObjectId>{
 	
-	void updateTime(Imei imei);
+	void updateImei(Imei imei);
 
 }

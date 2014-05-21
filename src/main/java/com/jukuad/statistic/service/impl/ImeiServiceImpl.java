@@ -22,7 +22,7 @@ public class ImeiServiceImpl extends BaseServiceImpl<Imei, ObjectId> implements
 	
 	
 	@Override
-	public void updateTime(Imei imei) 
+	public void updateImei(Imei imei) 
 	{
 		Imei data = dao.createQuery().field("value").equal(imei.getValue()).get();
 		if(data != null)

@@ -7,6 +7,8 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import org.bson.types.ObjectId;
 import org.slf4j.Logger;
@@ -23,6 +25,7 @@ import com.jukuad.statistic.pojo.Imei;
 import com.jukuad.statistic.pojo.RequestTemp;
 import com.jukuad.statistic.service.ImeiService;
 import com.jukuad.statistic.service.RequestTempService;
+import com.jukuad.statistic.util.Constant;
 import com.jukuad.statistic.util.ObjectUtil;
 @Service
 public class RequestTempServiceImpl extends BaseServiceImpl<RequestTemp, ObjectId> implements
@@ -73,7 +76,7 @@ public class RequestTempServiceImpl extends BaseServiceImpl<RequestTemp, ObjectI
 							RequestTemp temp = ObjectUtil.clientMessToRequest(object);
 							dao.save(temp);
 							Imei imei = ObjectUtil.clientMessToImei(object);
-							imeService.updateTime(imei);
+							imeService.updateImei(imei);
 						}
 						
 					} catch (Exception e) 
@@ -108,6 +111,32 @@ public class RequestTempServiceImpl extends BaseServiceImpl<RequestTemp, ObjectI
 		} catch (UnsupportedEncodingException e3) {
 			logger.error(e3.getMessage());
 		} 
+	}
+	
+	class ParseThread extends Thread
+	{
+		private String hour;
+		private String type;
+		private String root;
+		public ParseThread(String hour,String type,String root) {
+			this.hour = hour;
+			this.type = type;
+			this.root = root;
+		}
+		@Override
+		public void run() {
+			parseAndSaveAndCopy(hour, type, root);
+		}
+	}
+	
+	@Override
+	public void parseAndSaveAndCopy(String hour, String type) {
+		ExecutorService pool = Executors.newCachedThreadPool();
+		for (String root : Constant.PATH) {
+//			Thread t = new ParseThread(hour, type, root);
+//			t.run();
+			pool.submit(new ParseThread(hour, type, root));
+		}
 	}
 
 }

@@ -1,5 +1,7 @@
 package com.jukuad.statistic.config;
 
+import java.util.Date;
+
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
@@ -31,8 +33,13 @@ public class Application {
 		
 //		service.copyCollection("request");
 		
-		service.parseAndSaveAndCopy("2014-04-14-15", Constant.PATH_REQUEST, "d:/bin/logs/");
+		Long s = new Date().getTime();
+//		service.parseAndSaveAndCopy("2014-04-30-07", Constant.PATH_REQUEST);
+		service.parseAndSaveAndCopy("2014-04-30-07", Constant.PATH_REQUEST, "d:/bin/logs/");
+//		service.parseAndSaveAndCopy("2014-04-14-07", Constant.PATH_REQUEST, "e:/logs/");
+		Long e = new Date().getTime();
 		
+		System.out.println(e-s);
 		
     	
 //    	AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext();

@@ -224,5 +224,12 @@ public class BaseServiceImpl<T,K> implements BaseService<T,K>
 		} 
 	}
 	
+	@Override
+	public void parseAndSaveAndCopy(String hour, String type) {
+		for (String root : Constant.PATH) {
+			parseAndSaveAndCopy(hour, type, root);
+		}
+	}
+	
 }
 

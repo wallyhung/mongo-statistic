@@ -18,7 +18,7 @@
         <!-- 对同一个服务器尝试重连的时间(毫秒)，设为0时默认使用15秒 -->
         <property name="maxAutoConnectRetryTime" value="0" />
         <!-- 与每个主机的连接数，默认为10 -->
-        <property name="connectionsPerHost" value="10" />
+        <property name="connectionsPerHost" value="100" />
         <!-- 连接超时时间(毫秒)，默认为10000 -->
         <property name="connectTimeout" value="10000" />
         <!-- 是否创建一个finalize方法，以便在客户端没有关闭DBCursor的实例时，清理掉它。默认为true -->

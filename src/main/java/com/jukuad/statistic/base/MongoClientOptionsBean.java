@@ -8,7 +8,7 @@ public class MongoClientOptionsBean extends AbstractFactoryBean<MongoClientOptio
 {
 	private boolean autoConnectRetry = false;
 	private int maxAutoConnectRetryTime = 0;
-	private int connectionsPerHost = 10;
+	private int connectionsPerHost = 100;
 	private int connectTimeout = 10000;
 	private boolean cursorFinalizerEnabled = true;
 	private int maxWaitTime = 120000;

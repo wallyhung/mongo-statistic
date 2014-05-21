@@ -8,7 +8,7 @@ public class Constant
 	public final static String DB_TEMP = "temp";
 	
 	/**日志根路径**/
-	public final static String[] PATH = {"d:/bin/logs","e:/"};
+	public final static String[] PATH = {"d:/bin/logs/","e:/logs/"};
 	
 	/**点击日志路径**/
 	public final static String PATH_CLICK = "click";

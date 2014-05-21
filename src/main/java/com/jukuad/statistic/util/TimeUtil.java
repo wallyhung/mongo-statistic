@@ -328,8 +328,8 @@ public class TimeUtil {
 	
 	public static void main(String[] args) {
 		
-		System.out.println(StrToDate("2014-04-17 00:00:00").getTime());
-		System.out.println(StrToDate("2014-04-17 23:59:59").getTime());
+		System.out.println(StrToDate("2014-04-23 00:00:00").getTime());
+		System.out.println(StrToDate("2014-04-23 23:59:59").getTime());
 //		System.out.println(getSevenDaysBefore(StrToDate("2014-04-01 23:59:59")));
 //		System.out.println(getEightDaysBefore(StrToDate("2014-04-01 23:59:59")));
 //		System.out.println(getOneMonthBefore(StrToDate("2014-04-01 23:59:59")));
@@ -347,5 +347,6 @@ public class TimeUtil {
 		for (String string : ss) {
 			System.out.println(string);
 		}
+		System.out.println(1398728736630l-1398726008466l);
 	}
 }

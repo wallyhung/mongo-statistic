@@ -60,5 +60,7 @@ public interface BaseService<T,K>
 	
 	void parseAndSaveAndCopy(String hour,String type,String root);
 	
+	void parseAndSaveAndCopy(String hour,String type);
+	
 	
 }
